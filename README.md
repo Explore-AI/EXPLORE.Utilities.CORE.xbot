@@ -6,9 +6,9 @@
 ## Installing this package from GitHub
 `pip install -e "git+https://github.com/Explore-AI/EXPLORE.Utilities.CORE.xbot#egg=xbot"`
 
-The command above will create a `src` folder and install the package in it with the name `xbot`. In the package folder, navigate to the `xbot` folder and run `python xbot.py -h` to see a list of commands.
-
 # How to use this package
+
+The command above will create a `src` folder and install the package in it with the name `xbot`. In the package folder, navigate to the `xbot` folder and run `python xbot.py -h` to see a list of commands.
 
 The following commands are available on the command line interface, with their usage explained below. You can view all possible commands and the arguments they accept by running `python xbot.py -h`. 
 
