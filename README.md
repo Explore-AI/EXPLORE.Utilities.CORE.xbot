@@ -1,4 +1,5 @@
-# EXPLORE CORE COMMAND LINE INTERFACE
+# xbot CLI
+The Command Line Interface for creating and interacting with a running Mesh instance within the EXPLORE CORE Platform.
 
 ## Building this package locally
 `python setup.py sdist`
@@ -42,4 +43,4 @@ Querying ports:
 
 This CLI is still in development and any feedback and comments would be appreciated. When testing, please think about how to make the user experience simpler and more intuitive. If there are parts of it that feel like they're surfacing too much information, or too little information, please let us know. 
 
-You can note all feedback and comments on [this Notion page](https://www.notion.so/exploreutils/xbot-Feedback-707fffa4a706419bb165606940619b0c). 
+You can note all feedback and comments on [this Notion page](https://www.notion.so/exploreutils/xbot-Feedback-707fffa4a706419bb165606940619b0c), or email core-platform@explore-utilities.com.
