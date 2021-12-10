@@ -4,9 +4,9 @@
 `python setup.py sdist`
 
 ## Installing this package from GitHub
-`pip install -e "git+https://github.com/Explore-AI/EXPLORE.Utilities.Epl.Core.git#egg=explore_core_commmand_line_interface&subdirectory=control_plane/core_cli"`
+`pip install -e "git+https://github.com/Explore-AI/EXPLORE.Utilities.CORE.xbot#egg=xbot"`
 
-The command above will create a `src` folder and install the package in it with the name `explore_core_commmand_line_interface`. In the package folder, navigate to the `xbot_cli` folder and run `python xbot.py -h` to see a list of commands.
+The command above will create a `src` folder and install the package in it with the name `xbot`. In the package folder, navigate to the `xbot` folder and run `python xbot.py -h` to see a list of commands.
 
 # How to use this package
 
