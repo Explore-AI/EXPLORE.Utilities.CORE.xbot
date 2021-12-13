@@ -10,7 +10,7 @@ The Command Line Interface for creating and interacting with a running Mesh inst
 Install the required dependencies: `pip install -r requirements.txt`
 # How to use this package
 
-The command above will create a `src` folder and install the `xbot-cli` package in it with the name. Navigate through these folders to the `xbot` folder (`cd src/xbot-cli/xbot`) and run `python xbot.py -h` to see a list of commands.
+The command above will create a `src` folder and install the `xbot-cli` package in it. Navigate through these folders to the `xbot` folder (`cd src/xbot-cli/xbot`) and run `python xbot.py -h` to see a list of commands.
 
 The following commands are available on the command line interface, with their usage explained below. You can view all possible commands and the arguments they accept by running `python xbot.py -h`. 
 ## Querying the mesh
