@@ -40,7 +40,7 @@ def list_total_nodes() -> None:
 
 def search_by_name(node_name: str) -> None:
     access_token = get_access_token()
-    request_url = f"{base_node_api_url}?name=eq.{node_name}"
+    request_url = f"{base_node_api_url}?name=phfts.{node_name}"
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
     headers["Authorization"] = f"Bearer {access_token}"
