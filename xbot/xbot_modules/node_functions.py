@@ -25,6 +25,20 @@ def list_all_nodes():
     else:
         print("There are currently no active nodes in your mesh.")
 
+def list_total_nodes() -> None:
+    access_token = get_access_token()
+    request_url = f"{base_node_api_url}"
+    headers = CaseInsensitiveDict()
+    headers["Accept"] = "application/json"
+    headers["Authorization"] = f"Bearer {access_token}"
+    r = requests.get(request_url, headers=headers)
+    node_data = json.loads(r.text)
+    if len(node_data) > 0:
+        total_nodes = len(node_data)
+        print(f"{total_nodes} nodes have been provisioned in your mesh.\n")
+    else:
+        print("There are currently no active nodes in your mesh.")
+
 
 def search_by_name(node_name: str) -> None:
     access_token = get_access_token()

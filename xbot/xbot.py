@@ -18,6 +18,9 @@ parser.add_argument(
     "-a", "-all", help="list all nodes in the mesh", action="store_true"
 )
 parser.add_argument(
+    "-total", help="list total number of nodes in the mesh", action="store_true"
+)
+parser.add_argument(
     "-s",
     "-state",
     choices=["provisioned", "started", "active", "error", "stopped", "suspended"],
@@ -121,6 +124,8 @@ if args.id:
 if args.i:
     node_id = str(args.i)
     view_node_interfaces(node_id)
+if args.total:
+    list_total_nodes()
 
 if __name__ == "__main__":
     parser.parse_args()
