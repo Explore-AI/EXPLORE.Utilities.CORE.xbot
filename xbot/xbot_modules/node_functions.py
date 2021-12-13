@@ -10,7 +10,6 @@ from xbot_modules.auth_functions import *
 
 base_node_api_url = "http://localhost:8085/rest/nodes"
 
-
 def list_all_nodes():
     access_token = get_access_token()
     request_url = f"{base_node_api_url}"
@@ -172,20 +171,22 @@ def add_new_node() -> None:
     The node ID is calculated by combining the node name and domain and getting the SHA256 hash of that string.
     """
     access_token = get_access_token()
+    
     node_name = input("\nEnter the name of the node: ")
     domain = input("\nEnter the domain of the node: ")
     node_description = input("\nEnter a description for the node: ")
     node_cloud_provider = input("\nEnter the cloud provider for the node: ")
-    node_id_params = f"{node_name}.{domain}"
-    node_id = hashlib.sha256(node_id_params.encode())
-    node_id = node_id.hexdigest()
-    request_url = f"{base_node_api_url}"
+    # node_id_params = f"{node_name}.{domain}"
+    # node_id = hashlib.sha256(node_id_params.encode())
+    # node_id = node_id.hexdigest()
+    
+    request_url = f"http://localhost:8085/rest/nodes"
+    headers = CaseInsensitiveDict()
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/vnd.pgrst.object+json"
     headers["Authorization"] = f"Bearer {access_token}"
     headers["Prefer"] = "return=representation"
     data = {
-        "id": node_id,
         "name": node_name,
         "domain": domain,
         "description": node_description,
@@ -194,6 +195,22 @@ def add_new_node() -> None:
     response = requests.post(request_url, headers=headers, data=data)
     if response.status_code == 201:
         print("\nNode added successfully!\n")
-        search_by_name(access_token, node_name)
+        search_by_name(node_name)
     else:
-        print(f"There was an error creating your node: {response.json()['message']}")
+        print(f"There was an error creating your node. Status code: {response.status_code}. Error message:{response.json()['message']}")
+        
+def delete_node(node_id:str) -> None:
+    if node_id == "":
+        print("\nPlease include the ID of the node you want to delete.\n")
+    else:
+        access_token = get_access_token()
+        request_url = f"{base_node_api_url}?id=eq.{node_id}"
+        headers = CaseInsensitiveDict()
+        headers["Accept"] = "application/json"
+        headers["Authorization"] = f"Bearer {access_token}"
+        response = requests.delete(request_url, headers=headers)
+        if response.status_code == 204:
+            print(f"\nNode {node_id} deleted successfully!\n")
+        else:
+            print(f"There was an error deleting your node. Status code: {response.status_code}. Error message:{response.json()['message']}")
+        

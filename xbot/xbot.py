@@ -70,6 +70,9 @@ parser.add_argument(
     "-an", "-add_node", help="add a new node to the mesh", action="store_true"
 )
 parser.add_argument(
+    "-delete", help="add a new node to the mesh"
+)
+parser.add_argument(
     "-n",
     "-name",
     help="search for a node by name.",
@@ -126,6 +129,9 @@ if args.i:
     view_node_interfaces(node_id)
 if args.total:
     list_total_nodes()
+if args.delete:
+    node_id = str(args.delete)
+    delete_node(node_id)
 
 if __name__ == "__main__":
     parser.parse_args()
