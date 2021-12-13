@@ -1,5 +1,6 @@
 xbot.egg-info
 xbot/__pycache__
+decision-log.md
 
 # macos files
 .DS_Store

@@ -11,6 +11,7 @@ def get_access_token() -> str:
     response = requests.post(url, json={"email": user_email, "password": user_password})
     if response.status_code == 200:
         token = response.json()["token"]
+        # print(token)
         return token
     else:
         print("The details you entered are incorrect, please try again")

@@ -54,7 +54,7 @@ def add_new_port() -> None:
     response = requests.post(request_url, headers=headers, data=data)
     if response.status_code == 201:
         print("Port added successfully!\n")
-        search_by_port_number(port_number, access_token)
+        search_by_port_number(port_number)
     else:
         print(
             f"There was an error adding your port: {response.error}.\nPlease try again.\n"
