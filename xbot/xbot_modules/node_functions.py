@@ -228,7 +228,7 @@ def add_new_node() -> None:
     # node_id = hashlib.sha256(node_id_params.encode())
     # node_id = node_id.hexdigest()
     
-    request_url = f"http://localhost:8085/rest/nodes"
+    request_url = f"http://localhost:3000/nodes"
     headers = CaseInsensitiveDict()
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/vnd.pgrst.object+json"

@@ -15,7 +15,7 @@ def get_access_token() -> str:
     """
     user_email = os.getenv("user_email")
     user_password = os.getenv("user_password")
-    url = "http://localhost:8085/rest/rpc/login"
+    url = "http://localhost:3000/rpc/login"
     response = requests.post(url, json={"email": user_email, "password": user_password})
     if response.status_code == 200:
         token = response.json()["token"]

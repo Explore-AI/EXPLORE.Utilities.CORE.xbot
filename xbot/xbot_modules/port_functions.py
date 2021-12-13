@@ -51,7 +51,7 @@ def list_by_port_state(state: str) -> None:
         state (str): provide the state of the ports you wish to view. Options are open or closed.
     """
     access_token = get_access_token()
-    request_url = f"http://localhost:8085/rest/ports?port_state=eq.{state}"
+    request_url = f"http://localhost:3000/ports?port_state=eq.{state}"
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
     headers["Authorization"] = f"Bearer {access_token}"
@@ -74,7 +74,7 @@ def search_by_port_number(port_number: int) -> None:
         port_number (int): provide the port number of the port you wish to view.
     """
     access_token = get_access_token()
-    request_url = f"http://localhost:8085/rest/ports?port_number=eq.{port_number}"
+    request_url = f"http://localhost:3000/ports?port_number=eq.{port_number}"
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
     headers["Authorization"] = f"Bearer {access_token}"
@@ -94,7 +94,7 @@ def add_new_port() -> None:
     port_number = input("\nEnter the port number of the port you want to add: ")
     port_name = input("\nEnter the name of the port: ")
     port_description = input("\nEnter a description for the port: ")
-    request_url = f"http://localhost:8085/rest/ports"
+    request_url = f"http://localhost:3000/ports"
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/vnd.pgrst.object+json"
     headers["Authorization"] = f"Bearer {access_token}"
