@@ -4,8 +4,9 @@ import json
 from xbot_modules.node_functions import *
 
 
-def list_by_port_state(state: str, access_token: str) -> None:
-    request_url = f"http://localhost:8085/rest/ports?select=port_number,name,description,port_state&port_state=eq.{state}"
+def list_by_port_state(state: str) -> None:
+    access_token = get_access_token()
+    request_url = f"http://localhost:8085/rest/ports?port_state=eq.{state}"
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
     headers["Authorization"] = f"Bearer {access_token}"
@@ -18,7 +19,8 @@ def list_by_port_state(state: str, access_token: str) -> None:
         print(f"There are currently no {state} nodes in your mesh.")
 
 
-def search_by_port_number(port_number: int, access_token: str) -> None:
+def search_by_port_number(port_number: int) -> None:
+    access_token = get_access_token()
     request_url = f"http://localhost:8085/rest/ports?port_number=eq.{port_number}"
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
@@ -31,8 +33,8 @@ def search_by_port_number(port_number: int, access_token: str) -> None:
         print(f"Port {port_number} does not exist in your mesh.")
 
 
-def add_new_port(access_token: str) -> None:
-    list_all_nodes(access_token)
+def add_new_port() -> None:
+    access_token = get_access_token()
     node_id = input("\nEnter the node ID of the node you want to add the port to: ")
     port_number = input("\nEnter the port number of the port you want to add: ")
     port_name = input("\nEnter the name of the port: ")

@@ -5,10 +5,14 @@ import datetime
 import pytz
 import hashlib
 
+from xbot_modules.node_functions import *
+from xbot_modules.auth_functions import *
+
 base_node_api_url = "http://localhost:8085/rest/nodes"
 
 
-def list_all_nodes(access_token):
+def list_all_nodes():
+    access_token = get_access_token()
     request_url = f"{base_node_api_url}"
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
@@ -22,7 +26,8 @@ def list_all_nodes(access_token):
         print("There are currently no active nodes in your mesh.")
 
 
-def search_by_name(access_token: str, node_name: str) -> None:
+def search_by_name(node_name: str) -> None:
+    access_token = get_access_token()
     request_url = f"{base_node_api_url}?name=eq.{node_name}"
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
@@ -31,7 +36,8 @@ def search_by_name(access_token: str, node_name: str) -> None:
     node_data = json.loads(r.text)
     print(json.dumps(node_data, indent=4, sort_keys=True))
     
-def search_by_id(access_token: str, node_id: str) -> None:
+def search_by_id(node_id: str) -> None:
+    access_token = get_access_token()
     request_url = f"{base_node_api_url}?id=eq.{node_id}"
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
@@ -41,7 +47,8 @@ def search_by_id(access_token: str, node_id: str) -> None:
     print(json.dumps(node_data, indent=4, sort_keys=True))
 
 
-def list_by_state(state: str, access_token: str) -> None:
+def list_by_state(state: str) -> None:
+    access_token = get_access_token()
     request_url = f"{base_node_api_url}?node_state=eq.{state}"
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
@@ -54,7 +61,8 @@ def list_by_state(state: str, access_token: str) -> None:
         print(f"There are currently no {state} nodes in your mesh.")
 
 
-def list_by_cloud_provider(cloud_provider, access_token):
+def list_by_cloud_provider(cloud_provider):
+    access_token = get_access_token()
     request_url = f"{base_node_api_url}?node_cloud_provider=eq.{cloud_provider}"
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
@@ -77,7 +85,8 @@ def list_by_cloud_provider(cloud_provider, access_token):
         )
 
 
-def list_by_node_category(node_category, access_token):
+def list_by_node_category(node_category):
+    access_token = get_access_token()
     request_url = (
         f"{base_node_api_url}?node_category=eq.{node_category}"
     )
@@ -96,7 +105,8 @@ def list_by_node_category(node_category, access_token):
         print(f"There are currently no {node_category} nodes in your mesh.")
 
 
-def list_by_node_type(node_type, access_token):
+def list_by_node_type(node_type: str) -> None:
+    access_token = get_access_token()
     request_url = f"{base_node_api_url}?node_type=eq.{node_type}"
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
@@ -110,7 +120,8 @@ def list_by_node_type(node_type, access_token):
         print(f"There are currently no {node_type} nodes in your mesh.")
 
 
-def list_by_date(days_ago, access_token):
+def list_by_date(days_ago):
+    access_token = get_access_token()
     request_url = f"{base_node_api_url}"
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
@@ -139,13 +150,14 @@ def list_by_date(days_ago, access_token):
             print(f"There are currently no provisioned nodes in your mesh.")
 
 
-def add_new_node(access_token: str) -> None:
+def add_new_node() -> None:
     """
     This function will add a new node to the mesh.
 
     The user will be prompted to enter the node name, domain, and node description, and cloud provider.
     The node ID is calculated by combining the node name and domain and getting the SHA256 hash of that string.
     """
+    access_token = get_access_token()
     node_name = input("\nEnter the name of the node: ")
     domain = input("\nEnter the domain of the node: ")
     node_description = input("\nEnter a description for the node: ")
