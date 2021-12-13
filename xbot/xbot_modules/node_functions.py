@@ -7,7 +7,7 @@ import pytz
 from xbot_modules.node_functions import *
 from xbot_modules.util_functions import *
 
-base_node_api_url = "http://localhost:8085/rest/nodes"
+base_node_api_url = "http://localhost:3000/nodes"
 
 def list_all_nodes() -> None:
     """Retrieve and list all nodes in the mesh

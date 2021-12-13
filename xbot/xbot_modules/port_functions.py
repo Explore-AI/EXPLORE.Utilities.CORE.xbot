@@ -5,7 +5,7 @@ import json
 from xbot_modules.node_functions import *
 from xbot_modules.util_functions import *
 
-base_port_api_url = "http://localhost:8085/rest/ports"
+base_port_api_url = "http://localhost:3000/ports"
 
 def list_all_ports() -> None:
     """Retrieve and list all ports in the mesh

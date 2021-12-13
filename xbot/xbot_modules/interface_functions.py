@@ -4,7 +4,7 @@ import json
 
 from xbot_modules.util_functions import *
 
-base_url = "http://localhost:8085/rest/interfaces"
+base_url = "http://localhost:3000/interfaces"
 
 def view_node_interfaces(node_id: str) -> None:
     """View interfaces available on a specific node.

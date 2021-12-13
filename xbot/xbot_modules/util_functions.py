@@ -5,7 +5,7 @@ import os
 from dotenv import load_dotenv
 load_dotenv()
 
-base_node_api_url = "http://localhost:8085/rest/nodes"
+base_node_api_url = "http://localhost:3000/nodes"
 
 def get_access_token() -> str:
     """Generates an access token required to make requests to the API.
@@ -19,7 +19,7 @@ def get_access_token() -> str:
     response = requests.post(url, json={"email": user_email, "password": user_password})
     if response.status_code == 200:
         token = response.json()["token"]
-        # print(token)
+        print(token)
         return token
     else:
         print("The details you entered are incorrect, please try again")
