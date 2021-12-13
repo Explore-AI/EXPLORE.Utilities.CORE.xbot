@@ -25,7 +25,7 @@ def list_all_nodes() -> None:
         for node in node_data:
             node_name = node["name"]
             node_id = node["id"]
-            print(f"{node_name}: {node_id} \n")
+            print(f"{node_name.upper()}: {node_id} \n")
     else:
         print("There are currently no active nodes in your mesh.")
 
@@ -94,7 +94,7 @@ def list_by_state(state: str) -> None:
         for node in node_data:
             node_name = node["name"]
             node_id = node["id"]
-            print(f"{node_name}: {node_id} \n")
+            print(f"{node_name.upper()}: {node_id} \n")
     else:
         print(f"There are currently no {state} nodes in your mesh.")
 
@@ -117,7 +117,7 @@ def list_by_cloud_provider(cloud_provider: str) -> None:
         for node in node_data:
             node_name = node["name"]
             node_id = node["id"]
-            print(f"{node_name}: {node_id} \n")
+            print(f"{node_name.upper()}: {node_id} \n")
     else:
         print(
             "There are currently no active "
@@ -148,7 +148,7 @@ def list_by_node_category(node_category: str) -> None:
         for node in node_data:
             node_name = node["name"]
             node_id = node["id"]
-            print(f"{node_name}: {node_id} \n")
+            print(f"{node_name.upper()}: {node_id} \n")
 
     else:
         print(f"There are currently no {node_category} nodes in your mesh.")
@@ -172,7 +172,7 @@ def list_by_node_type(node_type: str) -> None:
         for node in node_data:
             node_name = node["name"]
             node_id = node["id"]
-            print(f"{node_name}: {node_id} \n")
+            print(f"{node_name.upper()}: {node_id} \n")
     else:
         print(f"There are currently no {node_type} nodes in your mesh.")
 
@@ -224,11 +224,7 @@ def add_new_node() -> None:
     node_name = input("\nEnter the name of the node: ")
     domain = input("\nEnter the domain of the node: ")
     node_description = input("\nEnter a description for the node: ")
-    node_cloud_provider = input("\nEnter the cloud provider for the node: ")
-    # node_id_params = f"{node_name}.{domain}"
-    # node_id = hashlib.sha256(node_id_params.encode())
-    # node_id = node_id.hexdigest()
-    
+    node_cloud_provider = input("\nEnter the cloud provider for the node: ")    
     request_url = f"http://localhost:3000/nodes"
     headers = CaseInsensitiveDict()
     headers = CaseInsensitiveDict()
