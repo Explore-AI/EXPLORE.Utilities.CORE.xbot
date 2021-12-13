@@ -38,7 +38,6 @@ def list_total_nodes() -> None:
     else:
         print("There are currently no active nodes in your mesh.")
 
-
 def search_by_name(node_name: str) -> None:
     access_token = get_access_token()
     request_url = f"{base_node_api_url}?name=eq.{node_name}"
@@ -59,6 +58,15 @@ def search_by_id(node_id: str) -> None:
     node_data = json.loads(r.text)
     print(json.dumps(node_data, indent=4, sort_keys=True))
 
+def get_node_name(node_id: str) -> str:
+    access_token = get_access_token()
+    request_url = f"{base_node_api_url}?id=eq.{node_id}"
+    headers = CaseInsensitiveDict()
+    headers["Accept"] = "application/json"
+    headers["Authorization"] = f"Bearer {access_token}"
+    r = requests.get(request_url, headers=headers)
+    node_data = json.loads(r.text)
+    return node_data[0]["name"]
 
 def list_by_state(state: str) -> None:
     access_token = get_access_token()

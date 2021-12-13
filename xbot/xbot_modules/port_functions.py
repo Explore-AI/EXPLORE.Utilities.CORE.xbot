@@ -3,6 +3,8 @@ from requests.structures import CaseInsensitiveDict
 import json
 from xbot_modules.node_functions import *
 
+base_port_api_url = "http://localhost:8085/rest/ports"
+
 
 def list_by_port_state(state: str) -> None:
     access_token = get_access_token()
@@ -59,3 +61,20 @@ def add_new_port() -> None:
         print(
             f"There was an error adding your port: {response.error}.\nPlease try again.\n"
         )
+
+def delete_port(port_number: int, node_id:str) -> None:
+        access_token = get_access_token()
+        request_url = f"{base_port_api_url}?node_id=eq.{node_id}&port_number=eq.{port_number}"
+        headers = CaseInsensitiveDict()
+        headers["Accept"] = "application/json"
+        headers["Authorization"] = f"Bearer {access_token}"
+        node_name = get_node_name(node_id)
+        confirm_deletion = input(f"Are you sure you want to delete port {port_number} on the {node_name.upper()} node? (y/n): ")
+        if confirm_deletion.lower() == "y":
+            response = requests.delete(request_url, headers=headers)
+            if response.status_code == 204:
+                print(f"\nPort {port_number} on node{node_id} deleted successfully!\n")
+            else:
+                print(f"There was an error deleting your port. Status code: {response.status_code}. Error message:{response.json()['message']}")
+        else:
+            print("Port deletion cancelled.")

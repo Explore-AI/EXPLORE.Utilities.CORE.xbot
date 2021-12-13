@@ -70,7 +70,10 @@ parser.add_argument(
     "-an", "-add_node", help="add a new node to the mesh", action="store_true"
 )
 parser.add_argument(
-    "-delete", help="add a new node to the mesh"
+    "-delete_node", help="delete a node from your mesh"
+)
+parser.add_argument(
+    "-delete_port", nargs=2, help="delete a port from a node"
 )
 parser.add_argument(
     "-n",
@@ -129,9 +132,14 @@ if args.i:
     view_node_interfaces(node_id)
 if args.total:
     list_total_nodes()
-if args.delete:
+if args.delete_node:
     node_id = str(args.delete)
     delete_node(node_id)
+    
+if args.delete_port:
+    port_number = str(args.delete_port[0])
+    node_id = str(args.delete_port[1])
+    delete_port(port_number, node_id)
 
 if __name__ == "__main__":
     parser.parse_args()
