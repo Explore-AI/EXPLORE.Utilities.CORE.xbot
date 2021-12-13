@@ -31,10 +31,20 @@ Querying nodes:
 - `python xbot.py -n` or `python xbot.py -name`: allows you to search for a node by name. Example: `python xbot.py -n `
 - `python xbot.py -id`: allows you to search for a node by ID. Example: `python xbot.py -id  27b355d7c2c6186c4a2b7d1f1381b6acfdb1f6a44bfc6651d8bb733c746433e5`
 
+Deleting nodes:
+- `python xbot.py -delete_node`: allows you to delete a node by providing the node ID. Example: `python xbot.py -delete_node 43584d4d8d6ee7f879f6ca9e38e164d21b19576ddfd0231dfe9354caddc9b471`
+---
 Querying ports: 
 
 - `python xbot.py -ps` or `python xbot.py -port_state`: allows you to query ports based on their state i.e. open or closed. Example: `python xbot.py -ps open`
 - `python xbot.py -pn` or `python xbot.py -port_number`: allows you to search for port information based on port number. Example: `python xbot.py -pn 300`
+
+Deleting ports:
+- `python xbot.py -delete_port`: allows you to delete a port by providing the port number and the node ID of the node where the port can be found. Example: `python xbot.py -delete_port 3000 43584d4d8d6ee7f879f6ca9e38e164d21b19576ddfd0231dfe9354caddc9b471` will delete port 3000 on the node with the given ID. It's necessary to supply both the port number and the node ID because a port with the same number can exist on multiple nodes. 
+---
+Querying interfaces:
+- `python xbot.py -i` or `python xbot.py -interface`: allows you to retrieve the interface for a specific node by proving a node ID. Example: `python xbot.py -interface 43584d4d8d6ee7f879f6ca9e38e164d21b19576ddfd0231dfe9354caddc9b471`
+
 
 ### Altering the mesh
 - `python xbot.py -an` or `python xbot.py -add_node`: allows you to add a new node to the mesh. Running the command will lead to a series of prompts to collect information about the node, which will then be used to create the node. No additional arguments are required.  

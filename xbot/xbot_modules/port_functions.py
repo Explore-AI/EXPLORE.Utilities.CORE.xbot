@@ -1,12 +1,19 @@
 import requests
 from requests.structures import CaseInsensitiveDict
 import json
+
 from xbot_modules.node_functions import *
+from xbot_modules.util_functions import *
 
 base_port_api_url = "http://localhost:8085/rest/ports"
 
 
 def list_by_port_state(state: str) -> None:
+    """This function lists all ports in a given state.
+
+    Args:
+        state (str): provide the state of the ports you wish to view. Options are open or closed.
+    """
     access_token = get_access_token()
     request_url = f"http://localhost:8085/rest/ports?port_state=eq.{state}"
     headers = CaseInsensitiveDict()
@@ -22,6 +29,11 @@ def list_by_port_state(state: str) -> None:
 
 
 def search_by_port_number(port_number: int) -> None:
+    """This function searches for a port by port number.
+
+    Args:
+        port_number (int): provide the port number of the port you wish to view.
+    """
     access_token = get_access_token()
     request_url = f"http://localhost:8085/rest/ports?port_number=eq.{port_number}"
     headers = CaseInsensitiveDict()
@@ -36,6 +48,8 @@ def search_by_port_number(port_number: int) -> None:
 
 
 def add_new_port() -> None:
+    """This function adds a new port to the mesh. The user is prompted to enter the node ID, port number, and port state.
+    """
     access_token = get_access_token()
     node_id = input("\nEnter the node ID of the node you want to add the port to: ")
     port_number = input("\nEnter the port number of the port you want to add: ")
@@ -63,18 +77,25 @@ def add_new_port() -> None:
         )
 
 def delete_port(port_number: int, node_id:str) -> None:
-        access_token = get_access_token()
-        request_url = f"{base_port_api_url}?node_id=eq.{node_id}&port_number=eq.{port_number}"
-        headers = CaseInsensitiveDict()
-        headers["Accept"] = "application/json"
-        headers["Authorization"] = f"Bearer {access_token}"
-        node_name = get_node_name(node_id)
-        confirm_deletion = input(f"Are you sure you want to delete port {port_number} on the {node_name.upper()} node? (y/n): ")
-        if confirm_deletion.lower() == "y":
-            response = requests.delete(request_url, headers=headers)
-            if response.status_code == 204:
-                print(f"\nPort {port_number} on node{node_id} deleted successfully!\n")
-            else:
-                print(f"There was an error deleting your port. Status code: {response.status_code}. Error message:{response.json()['message']}")
+    """Delete a port from a specific node in the mesh.
+
+    Args:
+        port_number (int): The port number of the port you wish to delete.
+        
+        node_id (str): The node ID of the node you wish to delete the port from.
+    """
+    access_token = get_access_token()
+    request_url = f"{base_port_api_url}?node_id=eq.{node_id}&port_number=eq.{port_number}"
+    headers = CaseInsensitiveDict()
+    headers["Accept"] = "application/json"
+    headers["Authorization"] = f"Bearer {access_token}"
+    node_name = get_node_name(node_id)
+    confirm_deletion = input(f"Are you sure you want to delete port {port_number} on the {node_name.upper()} node? (y/n): ")
+    if confirm_deletion.lower() == "y":
+        response = requests.delete(request_url, headers=headers)
+        if response.status_code == 204:
+            print(f"\nPort {port_number} on node{node_id} deleted successfully!\n")
         else:
-            print("Port deletion cancelled.")
+            print(f"There was an error deleting your port. Status code: {response.status_code}. Error message:{response.json()['message']}")
+    else:
+        print("Port deletion cancelled.")

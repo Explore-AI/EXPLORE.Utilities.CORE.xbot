@@ -3,14 +3,15 @@ from requests.structures import CaseInsensitiveDict
 import json
 import datetime
 import pytz
-import hashlib
 
 from xbot_modules.node_functions import *
-from xbot_modules.auth_functions import *
+from xbot_modules.util_functions import *
 
 base_node_api_url = "http://localhost:8085/rest/nodes"
 
-def list_all_nodes():
+def list_all_nodes() -> None:
+    """Retrieve and list all nodes in the mesh
+    """
     access_token = get_access_token()
     request_url = f"{base_node_api_url}"
     headers = CaseInsensitiveDict()
@@ -25,6 +26,8 @@ def list_all_nodes():
         print("There are currently no active nodes in your mesh.")
 
 def list_total_nodes() -> None:
+    """List the total number of nodes present in the mesh.
+    """
     access_token = get_access_token()
     request_url = f"{base_node_api_url}"
     headers = CaseInsensitiveDict()
@@ -39,6 +42,11 @@ def list_total_nodes() -> None:
         print("There are currently no active nodes in your mesh.")
 
 def search_by_name(node_name: str) -> None:
+    """Search for a node by name.
+
+    Args:
+        node_name (str): The name of the node to search for.
+    """
     access_token = get_access_token()
     request_url = f"{base_node_api_url}?name=phfts.{node_name}"
     headers = CaseInsensitiveDict()
@@ -49,6 +57,11 @@ def search_by_name(node_name: str) -> None:
     print(json.dumps(node_data, indent=4, sort_keys=True))
     
 def search_by_id(node_id: str) -> None:
+    """Search for a node by ID.
+
+    Args:
+        node_id (str): The ID of the node to search for.
+    """
     access_token = get_access_token()
     request_url = f"{base_node_api_url}?id=eq.{node_id}"
     headers = CaseInsensitiveDict()
@@ -58,17 +71,13 @@ def search_by_id(node_id: str) -> None:
     node_data = json.loads(r.text)
     print(json.dumps(node_data, indent=4, sort_keys=True))
 
-def get_node_name(node_id: str) -> str:
-    access_token = get_access_token()
-    request_url = f"{base_node_api_url}?id=eq.{node_id}"
-    headers = CaseInsensitiveDict()
-    headers["Accept"] = "application/json"
-    headers["Authorization"] = f"Bearer {access_token}"
-    r = requests.get(request_url, headers=headers)
-    node_data = json.loads(r.text)
-    return node_data[0]["name"]
 
 def list_by_state(state: str) -> None:
+    """List nodes based state.
+
+    Args:
+        state (str): The state of the node to search for. Options include "provisioned", "started", "active", "error", "stopped", and "suspended". 
+    """
     access_token = get_access_token()
     request_url = f"{base_node_api_url}?node_state=eq.{state}"
     headers = CaseInsensitiveDict()
@@ -82,7 +91,12 @@ def list_by_state(state: str) -> None:
         print(f"There are currently no {state} nodes in your mesh.")
 
 
-def list_by_cloud_provider(cloud_provider):
+def list_by_cloud_provider(cloud_provider: str) -> None:
+    """List nodes based on the cloud provider they're running on.
+
+    Args:
+        cloud_provider (str): The cloud provider of the node to search for. Options include "aws", "azure", and "gcp".
+    """
     access_token = get_access_token()
     request_url = f"{base_node_api_url}?node_cloud_provider=eq.{cloud_provider}"
     headers = CaseInsensitiveDict()
@@ -106,7 +120,12 @@ def list_by_cloud_provider(cloud_provider):
         )
 
 
-def list_by_node_category(node_category):
+def list_by_node_category(node_category: str) -> None:
+    """List nodes based on their category.
+
+    Args:
+        node_category (str): The category of the node to search for. Options include "source", "ingest", "enrich" and "serve".
+    """
     access_token = get_access_token()
     request_url = (
         f"{base_node_api_url}?node_category=eq.{node_category}"
@@ -127,6 +146,11 @@ def list_by_node_category(node_category):
 
 
 def list_by_node_type(node_type: str) -> None:
+    """List nodes based on their type.
+
+    Args:
+        node_type (str): The type of the node to search for. Options include "digital-twin", "aggregate", and "operational".
+    """
     access_token = get_access_token()
     request_url = f"{base_node_api_url}?node_type=eq.{node_type}"
     headers = CaseInsensitiveDict()
@@ -141,7 +165,12 @@ def list_by_node_type(node_type: str) -> None:
         print(f"There are currently no {node_type} nodes in your mesh.")
 
 
-def list_by_date(days_ago):
+def list_by_date(days_ago: int) -> None:
+    """List nodes based on the date they were created.
+
+    Args:
+        days_ago (int): Provide the number of days to search for, e.g. "1" for the last day, "7" for the last week, etc.
+    """
     access_token = get_access_token()
     request_url = f"{base_node_api_url}"
     headers = CaseInsensitiveDict()
@@ -208,6 +237,11 @@ def add_new_node() -> None:
         print(f"There was an error creating your node. Status code: {response.status_code}. Error message:{response.json()['message']}")
         
 def delete_node(node_id:str) -> None:
+    """Delete a node from the mesh.
+
+    Args:
+        node_id (str): The ID of the node to delete.
+    """
     if node_id == "":
         print("\nPlease include the ID of the node you want to delete.\n")
     else:

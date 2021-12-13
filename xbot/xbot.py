@@ -1,5 +1,5 @@
 import argparse
-from xbot_modules.auth_functions import * 
+from xbot_modules.util_functions import * 
 from xbot_modules.port_functions import *
 from xbot_modules.node_functions import *
 from xbot_modules.interface_functions import *
@@ -80,6 +80,7 @@ parser.add_argument(
     "-name",
     help="search for a node by name.",
 )
+
 parser.add_argument(
     "-id",
     help="search for a node by name.",
@@ -135,7 +136,6 @@ if args.total:
 if args.delete_node:
     node_id = str(args.delete)
     delete_node(node_id)
-    
 if args.delete_port:
     port_number = str(args.delete_port[0])
     node_id = str(args.delete_port[1])

@@ -2,11 +2,16 @@ import requests
 from requests.structures import CaseInsensitiveDict
 import json
 
-from xbot_modules.auth_functions import *
+from xbot_modules.util_functions import *
 
 base_url = "http://localhost:8085/rest/interfaces"
 
-def view_node_interfaces(node_id):
+def view_node_interfaces(node_id: str) -> None:
+    """View interfaces available on a specific node.
+
+    Args:
+        node_id (str): the node ID for the node you want to view interfaces for.
+    """
     access_token = get_access_token()
     request_url = f"{base_url}?node_id=eq.{node_id}"
     headers = CaseInsensitiveDict()
