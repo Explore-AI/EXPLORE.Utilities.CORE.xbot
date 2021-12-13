@@ -216,9 +216,12 @@ def delete_node(node_id:str) -> None:
         headers = CaseInsensitiveDict()
         headers["Accept"] = "application/json"
         headers["Authorization"] = f"Bearer {access_token}"
-        response = requests.delete(request_url, headers=headers)
-        if response.status_code == 204:
-            print(f"\nNode {node_id} deleted successfully!\n")
-        else:
-            print(f"There was an error deleting your node. Status code: {response.status_code}. Error message:{response.json()['message']}")
+        node_name = get_node_name(node_id)
+        confirm_deletion = input(f"Are you sure you want to delete the {node_name.upper()} (ID: {node_id})? (y/n): ")
+        if confirm_deletion.lower() == "y":
+            response = requests.delete(request_url, headers=headers)
+            if response.status_code == 204:
+                print(f"\nNode {node_id} deleted successfully!\n")
+            else:
+                print(f"There was an error deleting your node. Status code: {response.status_code}. Error message:{response.json()['message']}")
         
