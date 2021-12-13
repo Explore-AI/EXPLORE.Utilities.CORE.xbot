@@ -3,6 +3,7 @@ from requests.structures import CaseInsensitiveDict
 import json
 import datetime
 import pytz
+import subprocess
 
 from xbot_modules.node_functions import *
 from xbot_modules.util_functions import *
@@ -17,8 +18,8 @@ def list_all_nodes() -> None:
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
     headers["Authorization"] = f"Bearer {access_token}"
-    r = requests.get(request_url, headers=headers)
-    node_data = json.loads(r.text)
+    response = requests.get(request_url, headers=headers)
+    node_data = json.loads(response.text)
     if len(node_data) > 0:
         print("The following nodes have been provisioned in your mesh: \n")
         for node in node_data:
@@ -36,8 +37,8 @@ def list_total_nodes() -> None:
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
     headers["Authorization"] = f"Bearer {access_token}"
-    r = requests.get(request_url, headers=headers)
-    node_data = json.loads(r.text)
+    response = requests.get(request_url, headers=headers)
+    node_data = json.loads(response.text)
     if len(node_data) > 0:
         total_nodes = len(node_data)
         print(f"{total_nodes} nodes have been provisioned in your mesh.")
@@ -55,8 +56,8 @@ def search_by_name(node_name: str) -> None:
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
     headers["Authorization"] = f"Bearer {access_token}"
-    r = requests.get(request_url, headers=headers)
-    node_data = json.loads(r.text)
+    response = requests.get(request_url, headers=headers)
+    node_data = json.loads(response.text)
     print(json.dumps(node_data, indent=4, sort_keys=True))
     
 def search_by_id(node_id: str) -> None:
@@ -70,8 +71,8 @@ def search_by_id(node_id: str) -> None:
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
     headers["Authorization"] = f"Bearer {access_token}"
-    r = requests.get(request_url, headers=headers)
-    node_data = json.loads(r.text)
+    response = requests.get(request_url, headers=headers)
+    node_data = json.loads(response.text)
     print(json.dumps(node_data, indent=4, sort_keys=True))
 
 
@@ -86,8 +87,8 @@ def list_by_state(state: str) -> None:
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
     headers["Authorization"] = f"Bearer {access_token}"
-    r = requests.get(request_url, headers=headers)
-    node_data = json.loads(r.text)
+    response = requests.get(request_url, headers=headers)
+    node_data = json.loads(response.text)
     if len(node_data) > 0:
         print(f"The following {state.upper()} nodes have been provisioned in your mesh: \n")
         for node in node_data:
@@ -109,8 +110,8 @@ def list_by_cloud_provider(cloud_provider: str) -> None:
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
     headers["Authorization"] = f"Bearer {access_token}"
-    r = requests.get(request_url, headers=headers)
-    node_data = json.loads(r.text)
+    response = requests.get(request_url, headers=headers)
+    node_data = json.loads(response.text)
     if len(node_data) > 0:
         print(f"The following {cloud_provider.upper()} nodes have been provisioned in your mesh: \n")
         for node in node_data:
@@ -138,8 +139,8 @@ def list_by_node_category(node_category: str) -> None:
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
     headers["Authorization"] = f"Bearer {access_token}"
-    r = requests.get(request_url, headers=headers)
-    node_data = json.loads(r.text)
+    response = requests.get(request_url, headers=headers)
+    node_data = json.loads(response.text)
     if len(node_data) > 0:
         print(
             f"The following {node_category.upper()} nodes are active in your mesh: \n"
@@ -164,8 +165,8 @@ def list_by_node_type(node_type: str) -> None:
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
     headers["Authorization"] = f"Bearer {access_token}"
-    r = requests.get(request_url, headers=headers)
-    node_data = json.loads(r.text)
+    response = requests.get(request_url, headers=headers)
+    node_data = json.loads(response.text)
     if len(node_data) > 0:
         print(f"The following {node_type.upper()} nodes are active in your mesh: \n")
         for node in node_data:
@@ -187,8 +188,8 @@ def list_by_date(days_ago: int) -> None:
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
     headers["Authorization"] = f"Bearer {access_token}"
-    r = requests.get(request_url, headers=headers)
-    node_data = json.loads(r.text)
+    response = requests.get(request_url, headers=headers)
+    node_data = json.loads(response.text)
     if len(node_data) > 0:
         print(f"The following nodes were provisioned in the last {days_ago} days: \n")
     for node in node_data:
@@ -269,4 +270,30 @@ def delete_node(node_id:str) -> None:
                 print(f"\nNode {node_id} deleted successfully!\n")
             else:
                 print(f"There was an error deleting your node. Status code: {response.status_code}. Error message:{response.json()['message']}")
+
+def view_ancestors(node_id:str) -> None:
+    """View the ancestors of a node.
+
+    Args:
+        node_id (str): The ID of the node to view ancestors for.
+    """
+    if node_id == "":
+        print("\nPlease include the ID of the node you want to view ancestors for.\n")
+    else:
+        access_token = get_access_token()
+        request_url = f"http://localhost:3000/ancestor_nodes?root_node_id=eq.{node_id}"
+        headers = CaseInsensitiveDict()
+        headers["Accept"] = "application/json"
+        headers["Authorization"] = f"Bearer {access_token}"
+        response = requests.get(request_url, headers=headers)
+        node_data = json.loads(response.text)
+        if len(node_data) > 0:
+            node_name = get_node_name(node_id)
+            print(f"\nThe following nodes are ancestors of the {node_name.upper()} node: \n")
+            for node in node_data:
+                ancestor_node_name = node["ancestor_node_name"]
+                ancestor_node_id = node["ancestor_node_id"]
+                print(f"{ancestor_node_name.upper()}: {ancestor_node_id} \n")
         
+def launch_node() -> None:
+    subprocess.run(["bash", "example.sh"], cwd="../enrich/zonal_nightflow_enrichnode/scripts/")

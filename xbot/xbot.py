@@ -96,6 +96,15 @@ parser.add_argument(
     "-interface",
     help="search for available interfaces on a specific node. Requires you to provide a node id.",
 )
+parser.add_argument(
+    "-launch_node",
+    help="launch a node",
+    action="store_true",
+)
+parser.add_argument(
+    "-view_ancestors",
+    help="view the ancestors of a node",
+)
 
 args = parser.parse_args()
 
@@ -150,6 +159,11 @@ if args.delete_port:
     port_number = str(args.delete_port[0])
     node_id = str(args.delete_port[1])
     delete_port(port_number, node_id)
+if args.launch_node:
+    launch_node()
+if args.view_ancestors:
+    node_id = str(args.view_ancestors)
+    view_ancestors(node_id)
 
 if __name__ == "__main__":
     parser.parse_args()
