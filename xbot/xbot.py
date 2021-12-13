@@ -2,6 +2,7 @@ import argparse
 from xbot_modules.auth_functions import * 
 from xbot_modules.port_functions import *
 from xbot_modules.node_functions import *
+from xbot_modules.interface_functions import *
 
 user_email = "alice@email.com"
 user_password = "pass"
@@ -74,6 +75,11 @@ parser.add_argument(
     "-id",
     help="search for a node by name.",
 )
+parser.add_argument(
+    "-i",
+    "-interface",
+    help="search for available interfaces on a specific node. Requires you to provide a node id.",
+)
 
 args = parser.parse_args()
 
@@ -112,6 +118,9 @@ if args.n:
 if args.id:
     node_id = str(args.id)
     search_by_id(node_id)
+if args.i:
+    node_id = str(args.i)
+    view_node_interfaces(node_id)
 
 if __name__ == "__main__":
     parser.parse_args()
