@@ -7,6 +7,42 @@ from xbot_modules.util_functions import *
 
 base_port_api_url = "http://localhost:8085/rest/ports"
 
+def list_all_ports() -> None:
+    """Retrieve and list all ports in the mesh
+    """
+    access_token = get_access_token()
+    request_url = f"{base_port_api_url}"
+    headers = CaseInsensitiveDict()
+    headers["Accept"] = "application/json"
+    headers["Authorization"] = f"Bearer {access_token}"
+    r = requests.get(request_url, headers=headers)
+    port_data = json.loads(r.text)
+    if len(port_data) > 0:
+        print("The following nodes have been provisioned in your mesh: \n")
+        for port in port_data:
+            port_number = port["port_number"]
+            port_name = port["name"]
+            port_state = port["port_state"]
+            print(f"{port_number}: {port_name} - {port_state.upper()} \n")
+    else:
+        print("There are currently no active ports in your mesh.")
+
+def list_total_ports() -> None:
+    """List the total number of nodes present in the mesh.
+    """
+    access_token = get_access_token()
+    request_url = f"{base_port_api_url}"
+    headers = CaseInsensitiveDict()
+    headers["Accept"] = "application/json"
+    headers["Authorization"] = f"Bearer {access_token}"
+    r = requests.get(request_url, headers=headers)
+    port_data = json.loads(r.text)
+    if len(port_data) > 0:
+        total_ports = len(port_data)
+        print(f"{total_ports} ports have been provisioned in your mesh.")
+    else:
+        print("There are currently no active nodes in your mesh.")
+
 
 def list_by_port_state(state: str) -> None:
     """This function lists all ports in a given state.
@@ -23,7 +59,10 @@ def list_by_port_state(state: str) -> None:
     port_data = json.loads(r.text)
     if len(port_data) > 0:
         print(f"The following ports are {state.upper()} in your mesh: \n")
-        print(json.dumps(port_data, indent=4, sort_keys=True))
+        for port in port_data:
+            port_number = port["port_number"]
+            port_name = port["name"]
+            print(f"{port_number}: {port_name} \n")
     else:
         print(f"There are currently no {state} nodes in your mesh.")
 

@@ -15,10 +15,16 @@ parser.add_argument(
     "-l", "-login", help="provide credentials to login to the mesh", action="store_true"
 )
 parser.add_argument(
-    "-a", "-all", help="list all nodes in the mesh", action="store_true"
+    "-all_nodes", help="list all nodes in the mesh", action="store_true"
 )
 parser.add_argument(
-    "-total", help="list total number of nodes in the mesh", action="store_true"
+    "-all_ports", help="list all ports in the mesh", action="store_true"
+)
+parser.add_argument(
+    "-total_nodes", help="list total number of nodes in the mesh", action="store_true"
+)
+parser.add_argument(
+    "-total_ports", help="list total number of nodes in the mesh", action="store_true"
 )
 parser.add_argument(
     "-s",
@@ -95,8 +101,10 @@ args = parser.parse_args()
 
 if args.l:
     get_access_token()
-if args.a:
+if args.all_nodes:
     list_all_nodes()
+if args.all_ports:
+    list_all_ports()
 if args.s:
     state = str(args.s)
     list_by_state(state)
@@ -131,8 +139,10 @@ if args.id:
 if args.i:
     node_id = str(args.i)
     view_node_interfaces(node_id)
-if args.total:
+if args.total_nodes:
     list_total_nodes()
+if args.total_ports:
+    list_total_ports()
 if args.delete_node:
     node_id = str(args.delete)
     delete_node(node_id)

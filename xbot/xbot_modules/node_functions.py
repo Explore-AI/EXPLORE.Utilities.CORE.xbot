@@ -21,7 +21,10 @@ def list_all_nodes() -> None:
     node_data = json.loads(r.text)
     if len(node_data) > 0:
         print("The following nodes have been provisioned in your mesh: \n")
-        print(json.dumps(node_data, indent=4, sort_keys=True))
+        for node in node_data:
+            node_name = node["name"]
+            node_id = node["id"]
+            print(f"{node_name}: {node_id} \n")
     else:
         print("There are currently no active nodes in your mesh.")
 
@@ -37,7 +40,7 @@ def list_total_nodes() -> None:
     node_data = json.loads(r.text)
     if len(node_data) > 0:
         total_nodes = len(node_data)
-        print(f"{total_nodes} nodes have been provisioned in your mesh.\n")
+        print(f"{total_nodes} nodes have been provisioned in your mesh.")
     else:
         print("There are currently no active nodes in your mesh.")
 
@@ -86,7 +89,11 @@ def list_by_state(state: str) -> None:
     r = requests.get(request_url, headers=headers)
     node_data = json.loads(r.text)
     if len(node_data) > 0:
-        print(json.dumps(node_data, indent=4, sort_keys=True))
+        print(f"The following {state.upper()} nodes have been provisioned in your mesh: \n")
+        for node in node_data:
+            node_name = node["name"]
+            node_id = node["id"]
+            print(f"{node_name}: {node_id} \n")
     else:
         print(f"There are currently no {state} nodes in your mesh.")
 
@@ -105,13 +112,11 @@ def list_by_cloud_provider(cloud_provider: str) -> None:
     r = requests.get(request_url, headers=headers)
     node_data = json.loads(r.text)
     if len(node_data) > 0:
-        print(
-            "The following "
-            + str(cloud_provider).upper()
-            + " nodes are active in your mesh: \n"
-        )
-        print(json.dumps(node_data, indent=4, sort_keys=True))
-
+        print(f"The following {cloud_provider.upper()} nodes have been provisioned in your mesh: \n")
+        for node in node_data:
+            node_name = node["name"]
+            node_id = node["id"]
+            print(f"{node_name}: {node_id} \n")
     else:
         print(
             "There are currently no active "
@@ -139,7 +144,10 @@ def list_by_node_category(node_category: str) -> None:
         print(
             f"The following {node_category.upper()} nodes are active in your mesh: \n"
         )
-        print(json.dumps(node_data, indent=4, sort_keys=True))
+        for node in node_data:
+            node_name = node["name"]
+            node_id = node["id"]
+            print(f"{node_name}: {node_id} \n")
 
     else:
         print(f"There are currently no {node_category} nodes in your mesh.")
@@ -159,8 +167,11 @@ def list_by_node_type(node_type: str) -> None:
     r = requests.get(request_url, headers=headers)
     node_data = json.loads(r.text)
     if len(node_data) > 0:
-        print(f"The following {node_type} nodes are active in your mesh: \n")
-        print(json.dumps(node_data, indent=4, sort_keys=True))
+        print(f"The following {node_type.upper()} nodes are active in your mesh: \n")
+        for node in node_data:
+            node_name = node["name"]
+            node_id = node["id"]
+            print(f"{node_name}: {node_id} \n")
     else:
         print(f"There are currently no {node_type} nodes in your mesh.")
 
@@ -194,7 +205,7 @@ def list_by_date(days_ago: int) -> None:
         days_since_creation = (current_time - node_created_at).days
         if is_within_range:
             print(
-                f"{node['name']} --------------> {days_since_creation} days old"
+                f"{node['name']}: {days_since_creation} days old"
             )
         else:
             print(f"There are currently no provisioned nodes in your mesh.")
