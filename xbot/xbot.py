@@ -106,6 +106,10 @@ parser.add_argument(
     help="view the ancestors of a node",
 )
 parser.add_argument(
+    "-view_descendants",
+    help="view the ancestors of a node",
+)
+parser.add_argument(
     "-get_schema",
     help="view the ancestors of a node",
 )
@@ -168,6 +172,9 @@ if args.launch_node:
 if args.view_ancestors:
     node_id = str(args.view_ancestors)
     view_ancestors(node_id)
+if args.view_descendants:
+    node_id = str(args.view_descendants)
+    view_descendants(node_id)
 if args.get_schema:
     node_id = str(args.get_schema)
     get_schema(node_id)

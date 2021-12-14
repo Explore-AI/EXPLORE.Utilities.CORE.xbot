@@ -291,5 +291,29 @@ def view_ancestors(node_id:str) -> None:
                 ancestor_node_id = node["ancestor_node_id"]
                 print(f"{ancestor_node_name.upper()}: {ancestor_node_id} \n")
         
+def view_descendants(node_id:str) -> None:
+    """View the ancestors of a node.
+
+    Args:
+        node_id (str): The ID of the node to view ancestors for.
+    """
+    if node_id == "":
+        print("\nPlease include the ID of the node you want to view descendants for.\n")
+    else:
+        access_token = get_access_token()
+        request_url = f"http://localhost:3000/ancestor_nodes?root_node_id=eq.{node_id}"
+        headers = CaseInsensitiveDict()
+        headers["Accept"] = "application/json"
+        headers["Authorization"] = f"Bearer {access_token}"
+        response = requests.get(request_url, headers=headers)
+        node_data = json.loads(response.text)
+        if len(node_data) > 0:
+            node_name = get_node_name(node_id)
+            print(f"\nThe following nodes are descendants of the {node_name.upper()} node: \n")
+            for node in node_data:
+                descendant_node_name = node["descendant_node_name"]
+                descendant_node_id = node["descendant_node_id"]
+                print(f"{descendant_node_name.upper()}: {descendant_node_id} \n")
+        
 def launch_node() -> None:
     subprocess.run(["bash", "example.sh"], cwd="../enrich/zonal_nightflow_enrichnode/scripts/")
