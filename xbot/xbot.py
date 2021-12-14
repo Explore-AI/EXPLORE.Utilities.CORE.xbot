@@ -105,6 +105,10 @@ parser.add_argument(
     "-view_ancestors",
     help="view the ancestors of a node",
 )
+parser.add_argument(
+    "-get_schema",
+    help="view the ancestors of a node",
+)
 
 args = parser.parse_args()
 
@@ -164,6 +168,9 @@ if args.launch_node:
 if args.view_ancestors:
     node_id = str(args.view_ancestors)
     view_ancestors(node_id)
+if args.get_schema:
+    node_id = str(args.get_schema)
+    get_schema(node_id)
 
 if __name__ == "__main__":
     parser.parse_args()
