@@ -13,16 +13,20 @@ def get_access_token() -> str:
     Returns:
         str: JWT access token that is used in the headers of all requests.
     """
-    user_email = os.getenv("user_email")
-    user_password = os.getenv("user_password")
-    url = "http://localhost:3000/rpc/login"
-    response = requests.post(url, json={"email": user_email, "password": user_password})
-    if response.status_code == 200:
-        token = response.json()["token"]
-        # print(token)
-        return token
-    else:
-        print("The details you entered are incorrect, please try again")
+    try:
+        user_email = os.getenv("user_email")
+        user_password = os.getenv("user_password")
+        url = "http://localhost:3000/rpc/login"
+        response = requests.post(url, json={"email": user_email, "password": user_password})
+        if response.status_code == 200:
+            token = response.json()["token"]
+            return token
+        else:
+            print("The details entered are incorrect, do you have the required .env file?")
+            exit()
+    except Exception as e:
+        print(e)
+        exit()
 
 def get_node_name(node_id: str) -> str:
     """Get the name of a specific node.
