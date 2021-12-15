@@ -23,7 +23,6 @@ def get_access_token() -> str:
         return token
     else:
         print("The details you entered are incorrect, please try again")
-        get_access_token()
 
 def get_node_name(node_id: str) -> str:
     """Get the name of a specific node.
