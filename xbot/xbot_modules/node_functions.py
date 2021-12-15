@@ -315,5 +315,10 @@ def view_descendants(node_id:str) -> None:
                 descendant_node_id = node["descendant_node_id"]
                 print(f"{descendant_node_name.upper()}: {descendant_node_id} \n")
         
-def launch_node() -> None:
-    subprocess.run(["bash", "example.sh"], cwd="../enrich/zonal_nightflow_enrichnode/scripts/")
+def launch_node(node_name:str) -> None:
+    if node_name.lower() == "zonal_night_flow":
+        print(f"\nLaunching {node_name.upper()} node...\n")
+        subprocess.run(["docker-compose", "up"], cwd="/home/testuser/EXPLORE.Utilities.Epl.Core/enrich/clean_water/zonal_nightflow_enrichnode")
+    else:
+        print("\nNode launch cancelled.\n")
+        exit()

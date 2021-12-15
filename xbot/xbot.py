@@ -99,7 +99,6 @@ parser.add_argument(
 parser.add_argument(
     "-launch_node",
     help="launch a node",
-    action="store_true",
 )
 parser.add_argument(
     "-view_ancestors",
@@ -168,7 +167,8 @@ if args.delete_port:
     node_id = str(args.delete_port[1])
     delete_port(port_number, node_id)
 if args.launch_node:
-    launch_node()
+    node_name = str(args.launch_node)
+    launch_node(node_name)
 if args.view_ancestors:
     node_id = str(args.view_ancestors)
     view_ancestors(node_id)
