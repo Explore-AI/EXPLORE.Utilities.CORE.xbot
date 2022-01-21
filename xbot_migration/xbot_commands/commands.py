@@ -47,7 +47,8 @@ def total() -> None:
 @click.command()
 @click.option("--name", help="name of the node you're searching for")
 @click.option("--id", help="name of the node you're searching for")
-def search(name: str, id: str) -> None:
+@click.pass_context
+def search(ctx, name: str, id: str) -> None:
     """Search for a specific item.
 
     Args:
@@ -57,6 +58,24 @@ def search(name: str, id: str) -> None:
     target_item = sys.argv[1]
     argument = sys.argv[4]
     access_token = get_access_token()
+    if ctx.params["name"] is not None:
+        search_by_name(target_item, argument, access_token)
+    elif ctx.params["id"] is not None:
+        search_by_id(target_item, argument, access_token)
+
+
+def search_by_id(target_item, argument, access_token):
+    base_url = f"http://localhost:3000/{target_item}s"
+    request_url = f"{base_url}?id=eq.{argument}"
+    headers = CaseInsensitiveDict()
+    headers["Accept"] = "application/json"
+    headers["Authorization"] = f"Bearer {access_token}"
+    response = requests.get(request_url, headers=headers)
+    node_data = json.loads(response.text)
+    print(json.dumps(node_data, indent=4, sort_keys=True))
+
+
+def search_by_name(target_item, argument, access_token):
     base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?name=phfts.{argument}"
     headers = CaseInsensitiveDict()
