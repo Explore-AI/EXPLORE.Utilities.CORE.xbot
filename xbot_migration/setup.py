@@ -18,7 +18,7 @@ setup(
     install_requires=read_requirements(),
     entry_points={
         'console_scripts': [
-            'xbot = xbot_migration.xbot_cli.cli:cli',
+            'xbot = xbot_migration.xbot:xbot',
         ],
     },
 )
