@@ -2,7 +2,7 @@ import click
 import sys
 import logging
 
-from xbot_commands.commands import *
+from xbot_commands.commands import ls, total
 
 FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]

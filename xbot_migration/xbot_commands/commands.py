@@ -1,7 +1,7 @@
 import click
 import sys
 import logging
-from xbot_commands.util_functions import *
+from xbot_commands.util_functions import request_data
 
 FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
@@ -34,6 +34,5 @@ def total() -> None:
     target = sys.argv[1]
     base_url = f"http://localhost:3000/{target}s"
     target_data = request_data(base_url)
-    # print output in red
     logger.info(
         f"The total number of {target}s in your mesh is: {len(target_data)}")
