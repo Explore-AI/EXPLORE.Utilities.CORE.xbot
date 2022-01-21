@@ -12,13 +12,16 @@ from xbot_commands.util_functions import get_access_token, request_data
 FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
 
+ITEM_STATES = ["provisioned", "started", "active", "error", "stopped", "suspended"]
+
 logger = logging.getLogger()
 
 
 @click.command()
 @click.option("--count", help="number of items to be listed", type=int)
-@click.option("--state", help="list items of a certain state", type=str)
-def ls(ctx: object, count) -> None:
+@click.option("--state", help="list items by state", type=click.Choice(ITEM_STATES))
+@click.pass_context
+def ls(ctx, count: int, state: str) -> None:
     """List items in the mesh. Example: `xbot node ls --5` will list the 5 most recent items.
 
     Args:
@@ -27,11 +30,17 @@ def ls(ctx: object, count) -> None:
     target = sys.argv[1]
     base_url = f"http://localhost:3000/{target}s"
     target_data = request_data(base_url)
-    if len(target_data) > 0:
+    if ctx.params["count"] is not None:
         click.echo(f"The following {target}s have been provisioned in your mesh: \n")
         for target in target_data[:count]:
             target_name = target["name"]
             logger.info(f"{target_name.upper()}\n")
+    elif ctx.params["state"] is not None:
+        click.echo(f"The following {state} have been provisioned in your mesh: \n")
+        for item in target_data:
+            if item[f"{target}_state"] == ctx.params["state"]:
+                item_name = item["name"]
+                logger.info(f"{item_name.upper()}\n")
     else:
         click.echo(f"There are currently no active {target}s in your mesh.")
 
@@ -58,7 +67,6 @@ def search(ctx: object, name: str, id: str) -> None:
     """
     target_item = sys.argv[1]
     argument = sys.argv[4]
-    access_token = get_access_token()
     if ctx.params["name"] is not None:
         search_by_name(target_item, argument)
     elif ctx.params["id"] is not None:
