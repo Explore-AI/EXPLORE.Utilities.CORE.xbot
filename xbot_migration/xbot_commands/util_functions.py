@@ -46,4 +46,5 @@ def request_data(base_url):
     headers["Authorization"] = f"Bearer {access_token}"
     response = requests.get(request_url, headers=headers)
     target_data = json.loads(response.text)
-    return target_data
+    formatted_data = json.dumps(target_data, indent=4, sort_keys=True)
+    return formatted_data

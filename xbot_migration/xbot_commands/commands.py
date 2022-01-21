@@ -17,11 +17,12 @@ logger = logging.getLogger()
 
 @click.command()
 @click.option("--count", help="number of items to be listed", type=int)
-def ls(count) -> None:
+@click.option("--state", help="list items of a certain state", type=str)
+def ls(ctx: object, count) -> None:
     """List items in the mesh. Example: `xbot node ls --5` will list the 5 most recent items.
 
     Args:
-        count ([int]): number of items to be listed. Defaults to all items available.
+        count (int): number of items to be listed. Defaults to all items available.
     """
     target = sys.argv[1]
     base_url = f"http://localhost:3000/{target}s"
@@ -48,7 +49,7 @@ def total() -> None:
 @click.option("--name", help="name of the node you're searching for")
 @click.option("--id", help="name of the node you're searching for")
 @click.pass_context
-def search(ctx, name: str, id: str) -> None:
+def search(ctx: object, name: str, id: str) -> None:
     """Search for a specific item.
 
     Args:
@@ -59,28 +60,20 @@ def search(ctx, name: str, id: str) -> None:
     argument = sys.argv[4]
     access_token = get_access_token()
     if ctx.params["name"] is not None:
-        search_by_name(target_item, argument, access_token)
+        search_by_name(target_item, argument)
     elif ctx.params["id"] is not None:
-        search_by_id(target_item, argument, access_token)
+        search_by_id(target_item, argument)
 
 
-def search_by_id(target_item, argument, access_token):
+def search_by_id(target_item, argument):
     base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?id=eq.{argument}"
-    headers = CaseInsensitiveDict()
-    headers["Accept"] = "application/json"
-    headers["Authorization"] = f"Bearer {access_token}"
-    response = requests.get(request_url, headers=headers)
-    node_data = json.loads(response.text)
-    print(json.dumps(node_data, indent=4, sort_keys=True))
+    target_data = request_data(request_url)
+    logger.info(target_data)
 
 
-def search_by_name(target_item, argument, access_token):
+def search_by_name(target_item, argument):
     base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?name=phfts.{argument}"
-    headers = CaseInsensitiveDict()
-    headers["Accept"] = "application/json"
-    headers["Authorization"] = f"Bearer {access_token}"
-    response = requests.get(request_url, headers=headers)
-    node_data = json.loads(response.text)
-    print(json.dumps(node_data, indent=4, sort_keys=True))
+    target_data = request_data(request_url)
+    logger.info(target_data)
