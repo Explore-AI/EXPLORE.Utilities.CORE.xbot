@@ -1,5 +1,5 @@
 from importlib.metadata import entry_points
-from setuptools import setup
+from setuptools import setup, find_packages
 
 REQUIREMENTS_FILE = "requirements.txt"
 
@@ -13,9 +13,12 @@ def read_requirements(fpath=REQUIREMENTS_FILE):
 setup(
     name='xbot-cli',
     version="0.1",
-    packages=[''],
+    packages=find_packages(),
+    include_package_data=True,
     install_requires=read_requirements(),
     entry_points={
-        'console_scripts': ['xbot=xbot_migration.cli:xbot']
-    }
+        'console_scripts': [
+            'xbot = xbot_migration.xbot_cli.cli:cli',
+        ],
+    },
 )
