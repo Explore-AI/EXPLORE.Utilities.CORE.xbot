@@ -1,12 +1,16 @@
-import click
-import requests
-from requests.structures import CaseInsensitiveDict
 import json
 import os
+
+import click
+import requests
+
 from dotenv import load_dotenv
+from requests.structures import CaseInsensitiveDict
+
 load_dotenv()
 
 base_node_api_url = "http://localhost:3000/nodes"
+
 
 def get_access_token() -> str:
     """Generates an access token required to make requests to the API.
@@ -18,12 +22,16 @@ def get_access_token() -> str:
         user_email = os.getenv("user_email")
         user_password = os.getenv("user_password")
         url = "http://localhost:3000/rpc/login"
-        response = requests.post(url, json={"email": user_email, "password": user_password})
+        response = requests.post(
+            url, json={"email": user_email, "password": user_password}
+        )
         if response.status_code == 200:
             token = response.json()["token"]
             return token
         else:
-            click.echo("The details entered are incorrect, do you have the required .env file?")
+            click.echo(
+                "The details entered are incorrect, do you have the required .env file?"
+            )
             exit()
     except Exception as e:
         click.echo(e)

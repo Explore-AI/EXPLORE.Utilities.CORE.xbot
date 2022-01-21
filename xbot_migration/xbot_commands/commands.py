@@ -1,6 +1,8 @@
-import click
-import sys
 import logging
+import sys
+
+import click
+
 from xbot_commands.util_functions import request_data
 
 FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -10,16 +12,14 @@ logger = logging.getLogger()
 
 
 @click.command()
-@click.option('--count', help='number of items to be listed', type=int)
+@click.option("--count", help="number of items to be listed", type=int)
 def ls(count) -> None:
-    """ This command lists all the items in the mesh. Example: `xbot node list --5` will list the 5 most recent items.
-    """
+    """This command lists all the items in the mesh. Example: `xbot node list --5` will list the 5 most recent items."""
     target = sys.argv[1]
     base_url = f"http://localhost:3000/{target}s"
     target_data = request_data(base_url)
     if len(target_data) > 0:
-        click.echo(
-            f"The following {target}s have been provisioned in your mesh: \n")
+        click.echo(f"The following {target}s have been provisioned in your mesh: \n")
         for target in target_data[:count]:
             target_name = target["name"]
             logger.info(f"{target_name.upper()}\n")
@@ -29,10 +29,8 @@ def ls(count) -> None:
 
 @click.command()
 def total() -> None:
-    """ This command lists the total number of items present in the mesh. Example: `xbot node list --total` will list the total number of items in the mesh.
-    """
+    """This command lists the total number of items present in the mesh. Example: `xbot node list --total` will list the total number of items in the mesh."""
     target = sys.argv[1]
     base_url = f"http://localhost:3000/{target}s"
     target_data = request_data(base_url)
-    logger.info(
-        f"The total number of {target}s in your mesh is: {len(target_data)}")
+    logger.info(f"The total number of {target}s in your mesh is: {len(target_data)}")

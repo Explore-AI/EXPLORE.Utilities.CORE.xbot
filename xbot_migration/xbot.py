@@ -1,6 +1,6 @@
-import click
-import sys
 import logging
+
+import click
 
 from xbot_commands.commands import ls, total
 
@@ -18,29 +18,25 @@ logger = logging.getLogger()
     help="The desired log level",
 )
 def xbot(log_level: str) -> None:
-    logging.basicConfig(format=FORMATTER, level=getattr(
-        logging, log_level.upper()))
+    logging.basicConfig(format=FORMATTER, level=getattr(logging, log_level.upper()))
     logger.debug(f"Log level: {log_level.upper()}")
 
 
 @xbot.group()
 def node() -> None:
-    """Inspect nodes running in the mesh.
-    """
+    """Inspect nodes running in the mesh."""
     pass
 
 
 @xbot.group()
 def port() -> None:
-    """Inspect ports on nodes running in the mesh.
-    """
+    """Inspect ports on nodes running in the mesh."""
     pass
 
 
 @xbot.group()
 def interface() -> None:
-    """Inspect interfaces running in the mesh.
-    """
+    """Inspect interfaces running in the mesh."""
     pass
 
 
@@ -49,5 +45,5 @@ node.add_command(total)
 port.add_command(ls)
 port.add_command(total)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     xbot()
