@@ -168,3 +168,17 @@ def list_by_item_age(age: int, count: int, target: str = "node"):
         print_search(target_data[:count])
     else:
         logger.info(f"No {target}s provisioned within the last {age} days.")
+
+
+def search_by_id(target_item, argument):
+    base_url = f"http://localhost:3000/{target_item}s"
+    request_url = f"{base_url}?id=eq.{argument}"
+    target_data = request_data(request_url)
+    print_search(target_data)
+
+
+def search_by_name(target_item, argument):
+    base_url = f"http://localhost:3000/{target_item}s"
+    request_url = f"{base_url}?name=phfts.{argument}"
+    target_data = request_data(request_url)
+    print_search(target_data)

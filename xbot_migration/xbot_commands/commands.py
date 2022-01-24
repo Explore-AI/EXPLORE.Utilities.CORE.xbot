@@ -4,19 +4,26 @@ import logging
 import sys
 
 import click
+import requests
+
+from requests.structures import CaseInsensitiveDict
 
 from xbot_commands.util_functions import (
+    get_access_token,
     list_by_item_age,
     list_by_item_state,
     list_by_state_and_age,
     print_search,
     request_data,
+    search_by_id,
+    search_by_name,
 )
 
 FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
 
 ITEM_STATES = ["provisioned", "started", "active", "error", "stopped", "suspended"]
+CLOUD_PROVIDERS = ["aws", "azure", "gcp"]
 
 logger = logging.getLogger()
 
@@ -55,15 +62,6 @@ def ls(ctx, state: str, age: int, count: int = 5) -> None:
 
 
 @click.command()
-def total() -> None:
-    """This command lists the total number of items present in the mesh. Example: `xbot node list --total` will list the total number of items in the mesh."""
-    target = sys.argv[1]
-    base_url = f"http://localhost:3000/{target}s"
-    target_data = request_data(base_url)
-    logger.info(f"The total number of {target}s in your mesh is: {len(target_data)}")
-
-
-@click.command()
 @click.option("--name", help="name of the node you're searching for")
 @click.option("--id", help="name of the node you're searching for")
 @click.pass_context
@@ -82,15 +80,41 @@ def search(ctx: object, name: str, id: str) -> None:
         search_by_id(target_item, argument)
 
 
-def search_by_id(target_item, argument):
-    base_url = f"http://localhost:3000/{target_item}s"
-    request_url = f"{base_url}?id=eq.{argument}"
-    target_data = request_data(request_url)
-    print_search(target_data)
+@click.command()
+def total() -> None:
+    """This command lists the total number of items present in the mesh. Example: `xbot node list --total` will list the total number of items in the mesh."""
+    target = sys.argv[1]
+    base_url = f"http://localhost:3000/{target}s"
+    target_data = request_data(base_url)
+    logger.info(f"The total number of {target}s in your mesh is: {len(target_data)}")
 
 
-def search_by_name(target_item, argument):
-    base_url = f"http://localhost:3000/{target_item}s"
-    request_url = f"{base_url}?name=phfts.{argument}"
-    target_data = request_data(request_url)
-    print_search(target_data)
+@click.command()
+@click.option("--name", help="name of the node you're creating", type=str)
+@click.option("--domain", help="domain of the node you're creating", type=str)
+@click.option("--cloud", help="cloud provider", type=click.Choice(CLOUD_PROVIDERS))
+@click.pass_context
+def create(ctx: object, name: str, domain: str, cloud: str) -> None:
+    """This command creates a new item in the mesh. Example: `xbot node create --name "my_node" --domain "waste.water" --cloud aws` will create a new node."""
+    access_token = get_access_token()
+    target = sys.argv[1]
+    base_url = f"http://localhost:3000/{target}s"
+    headers = CaseInsensitiveDict()
+    headers["Accept"] = "application/vnd.pgrst.object+json"
+    headers["Authorization"] = f"Bearer {access_token}"
+    headers["Prefer"] = "return=representation"
+    name = ctx.params["name"]
+    data = {
+        "name": ctx.params["name"],
+        "domain": ctx.params["domain"],
+        "description": "Created by xbot",
+        "node_cloud_provider": ctx.params["cloud"],
+    }
+    response = requests.post(base_url, headers=headers, data=data)
+    if response.status_code == 201:
+        print("\nSuccess!\n")
+        search_by_name(target, ctx.params["name"])
+    else:
+        print(
+            f"There was an error creating your node. Status code: {response.status_code}. Error message:{response.json()['message']}"
+        )

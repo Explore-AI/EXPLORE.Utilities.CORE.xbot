@@ -2,7 +2,7 @@ import logging
 
 import click
 
-from xbot_commands.commands import ls, search, total
+from xbot_commands.commands import create, ls, search, total
 
 FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
@@ -43,6 +43,7 @@ def interface() -> None:
 node.add_command(ls)
 node.add_command(total)
 node.add_command(search)
+node.add_command(create)
 
 port.add_command(search)
 port.add_command(ls)
