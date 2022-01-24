@@ -1,5 +1,6 @@
 import datetime
 import json
+import logging
 import os
 
 import click
@@ -16,8 +17,12 @@ from rich.table import Table
 
 load_dotenv()
 
-base_node_api_url = "http://localhost:3000/nodes"
 console = Console()
+
+FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
+
+logger = logging.getLogger()
 
 
 def get_access_token() -> str:
@@ -104,3 +109,62 @@ def get_item_age(item: str) -> str:
     current_time = current.astimezone(tz)
     item_age = (current_time - date_created).days
     return item_age
+
+
+def list_by_state_and_age(
+    age: int, state: str = "active", count: int = 5, target: str = "node"
+):
+    """List items based on their state AND age.
+
+    Args:
+        age (int): number of days search criteria should apply to.
+        state (string): ["provisioned", "started", "active", "error", "stopped", "suspended"]
+        count (int): number of items to be listed. Defaults to 5 items.
+        target (str): the target item to be listed e.g. node, port or interface. Defaults to node.
+    """
+    from_datetime = datetime.datetime.now() - datetime.timedelta(age)
+    base_url = f"http://localhost:3000/{target}s"
+    request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}&{target}_state=eq.{state}"
+    target_data = request_data(request_url)
+    if target_data:
+        print_search(target_data[:count])
+    else:
+        logger.info(
+            f"No {target}s of state '{state}' provisioned within the last {age} days. Please refine your search."
+        )
+
+
+def list_by_item_state(state: str, count: int = 5, target: str = "node"):
+    """List items based on their state.
+
+    Args:
+        state (string): ["provisioned", "started", "active", "error", "stopped", "suspended"]
+        count (int): number of items to be listed. Defaults to 5 items.
+        target (str): the target item to be listed e.g. node, port or interface. Defaults to node.
+    """
+    base_url = f"http://localhost:3000/{target}s"
+    request_url = f"{base_url}?select=*&{target}_state=eq.{state}"
+    target_data = request_data(request_url)
+    if target_data:
+        print_search(target_data[:count])
+    else:
+        logger.info(f"No {target}s with state '{state}' found.")
+
+
+def list_by_item_age(age: int, count: int, target: str = "node"):
+    """List items based on their age.
+
+    Args:
+        age (int): number of days search criteria should apply to.
+        state (string): ["provisioned", "started", "active", "error", "stopped", "suspended"]
+        count (int): number of items to be listed. Defaults to 5 items.
+        target (str): the target item to be listed e.g. node, port or interface. Defaults to node.
+    """
+    from_datetime = datetime.datetime.now() - datetime.timedelta(age)
+    base_url = f"http://localhost:3000/{target}s"
+    request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}"
+    target_data = request_data(request_url)
+    if target_data:
+        print_search(target_data[:count])
+    else:
+        logger.info(f"No {target}s provisioned within the last {age} days.")

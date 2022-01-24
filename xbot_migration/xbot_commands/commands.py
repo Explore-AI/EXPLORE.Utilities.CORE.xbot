@@ -6,8 +6,9 @@ import sys
 import click
 
 from xbot_commands.util_functions import (
-    get_access_token,
-    get_item_age,
+    list_by_item_age,
+    list_by_item_state,
+    list_by_state_and_age,
     print_search,
     request_data,
 )
@@ -27,10 +28,11 @@ logger = logging.getLogger()
     "--age", help="list items provisioned within a certain timeframe", type=int
 )
 @click.pass_context
-def ls(ctx, state: str, age: str, count: int = 5) -> None:
+def ls(ctx, state: str, age: int, count: int = 5) -> None:
     """List items in the mesh. Example: `xbot node ls --5` will list the 5 most recent items.
 
     Args:
+        age (int): number of days search criteria should apply to.
         count (int): number of items to be listed. Defaults to 5 items.
         state (str): list items by state. Defaults to all states available.
     """
@@ -41,48 +43,15 @@ def ls(ctx, state: str, age: str, count: int = 5) -> None:
     include_state = ctx.params["state"]
     include_age = ctx.params["age"]
     if include_state and include_age:
-        from_datetime = datetime.datetime.now() - datetime.timedelta(age)
-        base_url = f"http://localhost:3000/{target}s"
-        request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}&{target}_state=eq.{state}"
-        target_data = request_data(request_url)
-        if target_data:
-            print_search(target_data[:count])
-        else:
-            logger.info(
-                f"No {target}s of state '{state}' provisioned within the last {age} days. Please refine your search."
-            )
+        list_by_state_and_age(age, state, count, target)
     elif include_state:
         list_by_item_state(state, count, target)
     elif include_age:
-        list_by_item_age(age, target)
+        list_by_item_age(age, count, target)
     elif include_count:
         print_search(target_data[:count])
     else:
         print_search(target_data)
-
-
-def list_by_item_state(state, count, target):
-    base_url = f"http://localhost:3000/{target}s"
-    request_url = f"{base_url}?select=*&{target}_state=eq.{state}"
-    target_data = request_data(request_url)
-    if target_data:
-        print_search(target_data[:count])
-    else:
-        logger.info(f"No {target}s with state '{state}' found.")
-
-
-def list_by_item_age(age, target, count: str = 5):
-    from_datetime = datetime.datetime.now() - datetime.timedelta(age)
-    base_url = f"http://localhost:3000/{target}s"
-    request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}"
-    target_data = request_data(request_url)
-    click.echo(
-        f"The following items were provisioned within the last {age} days:" + "\n"
-    )
-    if target_data:
-        print_search(target_data[:count])
-    else:
-        logger.info(f"No {target}s provisioned within the last {age} days.")
 
 
 @click.command()
