@@ -1,3 +1,5 @@
+# Other files
+diary.md
 xbot.egg-info
 xbot/__pycache__
 decision-log.md
@@ -127,7 +129,7 @@ logs/
 # vim swap files
 *.swp
 **.swp
-# Experiment tracking 
+# Experiment tracking
 mlruns/
 
 # Terraform
