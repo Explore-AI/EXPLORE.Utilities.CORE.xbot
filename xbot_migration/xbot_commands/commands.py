@@ -26,23 +26,32 @@ def ls(ctx, count: int, state: str) -> None:
 
     Args:
         count (int): number of items to be listed. Defaults to all items available.
+        state (str): list items by state. Defaults to all states available.
     """
     target = sys.argv[1]
     base_url = f"http://localhost:3000/{target}s"
     target_data = request_data(base_url)
-    if ctx.params["count"] is not None:
-        click.echo(f"The following {target}s have been provisioned in your mesh: \n")
+    include_count = ctx.params["count"]
+    include_state = ctx.params["state"]
+    if include_count is not None and include_state is None:
+        click.echo(f"The following {target}s are provisioned: \n")
         for target in target_data[:count]:
             target_name = target["name"]
             logger.info(f"{target_name.upper()}\n")
-    elif ctx.params["state"] is not None:
-        click.echo(f"The following {state} have been provisioned in your mesh: \n")
+    elif include_state is not None and include_count is None:
+        click.echo(f"The following {state} {target}'s are provisioned: \n")
         for item in target_data:
             if item[f"{target}_state"] == ctx.params["state"]:
                 item_name = item["name"]
                 logger.info(f"{item_name.upper()}\n")
+    elif include_count is not None and include_state is not None:
+        click.echo(f"{count} most recent {state} {target}'s: \n")
+        for item in target_data[:count]:
+            if item[f"{target}_state"] == ctx.params["state"]:
+                item_name = item["name"]
+                logger.info(f"{item_name.upper()}\n")
     else:
-        click.echo(f"There are currently no active {target}s in your mesh.")
+        click.echo(f"There are currently no {target}s that match your query.")
 
 
 @click.command()
