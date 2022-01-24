@@ -7,7 +7,7 @@ import requests
 
 from requests.structures import CaseInsensitiveDict
 
-from xbot_commands.util_functions import get_access_token, request_data
+from xbot_commands.util_functions import get_access_token, print_search, request_data
 
 FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
@@ -34,24 +34,13 @@ def ls(ctx, count: int, state: str) -> None:
     include_count = ctx.params["count"]
     include_state = ctx.params["state"]
     if include_count is not None and include_state is None:
-        click.echo(f"The following {target}s are provisioned: \n")
-        for target in target_data[:count]:
-            target_name = target["name"]
-            logger.info(f"{target_name.upper()}\n")
+        print_search(target_data[:count])
     elif include_state is not None and include_count is None:
-        click.echo(f"The following {state} {target}'s are provisioned: \n")
-        for item in target_data:
-            if item[f"{target}_state"] == ctx.params["state"]:
-                item_name = item["name"]
-                logger.info(f"{item_name.upper()}\n")
+        print_search(target_data)
     elif include_count is not None and include_state is not None:
-        click.echo(f"{count} most recent {state} {target}'s: \n")
-        for item in target_data[:count]:
-            if item[f"{target}_state"] == ctx.params["state"]:
-                item_name = item["name"]
-                logger.info(f"{item_name.upper()}\n")
+        print_search(target_data[:count])
     else:
-        click.echo(f"There are currently no {target}s that match your query.")
+        click.echo(f"No {target}s match your query.")
 
 
 @click.command()
