@@ -1,7 +1,9 @@
+import datetime
 import json
 import os
 
 import click
+import pytz
 import requests
 
 from dotenv import load_dotenv
@@ -63,24 +65,42 @@ def request_data(base_url: str) -> object:
     return target_data
 
 
-def print_items(target_data: object) -> None:
+def print_search(target_data: object) -> None:
     """Prints the data requested from the API.
 
     Args:
         target_data (object): JSON object containing the data requested based on the base_url.
     """
-    for item in target_data:
-        item_name = item["name"]
-        item_state = item["node_state"]
-        click.echo(f"{item_name.upper()} - {item_state}")
-
-
-def print_search(target_data: object) -> None:
-    table = Table(title="Search Results")
-    table.add_column("Item", justify="left", style="cyan", no_wrap=True)
+    table = Table(title="Results")
+    table.add_column("Name", justify="left", style="cyan", no_wrap=True)
     table.add_column("State", justify="left", style="magenta", no_wrap=True)
+    table.add_column("Age (days)", justify="left", style="green", no_wrap=True)
+    table.add_column("ID", justify="left", style="blue", no_wrap=False)
     n = 0
     for item in target_data:
+        age = get_item_age(item)
         n += 1
-        table.add_row(f'{n}. {item["name"]}', f'{item["node_state"]}')
+        table.add_row(
+            f'{n}. {item["name"]}', f'{item["node_state"]}', f"{age}", f'{item["id"]}'
+        )
     console.print(table)
+
+
+def get_item_age(item: str) -> str:
+    """Calculates the age of an item.
+
+    Args:
+        item (object): JSON object containing the data requested based on the base_url.
+
+    Returns:
+        str: the age of the item.
+    """
+
+    date_created = datetime.datetime.strptime(
+        item["date_created"], "%Y-%m-%dT%H:%M:%S.%f%z"
+    )
+    current = datetime.datetime.now().replace(tzinfo=pytz.UTC)
+    tz = pytz.timezone("Africa/Johannesburg")
+    current_time = current.astimezone(tz)
+    item_age = (current_time - date_created).days
+    return item_age
