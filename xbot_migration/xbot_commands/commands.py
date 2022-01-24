@@ -1,13 +1,16 @@
+import datetime
 import json
 import logging
 import sys
 
 import click
-import requests
 
-from requests.structures import CaseInsensitiveDict
-
-from xbot_commands.util_functions import get_access_token, print_search, request_data
+from xbot_commands.util_functions import (
+    get_access_token,
+    get_item_age,
+    print_search,
+    request_data,
+)
 
 FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
@@ -20,8 +23,11 @@ logger = logging.getLogger()
 @click.command()
 @click.option("--count", help="number of items to be listed", type=int)
 @click.option("--state", help="list items by state", type=click.Choice(ITEM_STATES))
+@click.option(
+    "--age", help="list items provisioned within a certain timeframe", type=int
+)
 @click.pass_context
-def ls(ctx, count: int, state: str) -> None:
+def ls(ctx, count: int, state: str, age: str) -> None:
     """List items in the mesh. Example: `xbot node ls --5` will list the 5 most recent items.
 
     Args:
@@ -33,14 +39,28 @@ def ls(ctx, count: int, state: str) -> None:
     target_data = request_data(base_url)
     include_count = ctx.params["count"]
     include_state = ctx.params["state"]
+    include_age = ctx.params["age"]
     if include_count is not None and include_state is None:
         print_search(target_data[:count])
     elif include_state is not None and include_count is None:
         print_search(target_data)
     elif include_count is not None and include_state is not None:
         print_search(target_data[:count])
+    elif include_age is not None:
+        request_by_item_age(age, target)
     else:
         click.echo(f"No {target}s match your query.")
+
+
+def request_by_item_age(age, target):
+    from_datetime = datetime.datetime.now() - datetime.timedelta(age)
+    base_url = f"http://localhost:3000/{target}s"
+    request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}"
+    target_data = request_data(request_url)
+    click.echo(
+        f"The following items were provisioned within the last {age} days:" + "\n"
+    )
+    print_search(target_data)
 
 
 @click.command()
@@ -75,11 +95,11 @@ def search_by_id(target_item, argument):
     base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?id=eq.{argument}"
     target_data = request_data(request_url)
-    logger.info(target_data)
+    print_search(target_data)
 
 
 def search_by_name(target_item, argument):
     base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?name=phfts.{argument}"
     target_data = request_data(request_url)
-    logger.info(target_data)
+    print_search(target_data)

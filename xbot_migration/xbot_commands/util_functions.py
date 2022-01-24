@@ -65,7 +65,7 @@ def request_data(base_url: str) -> object:
     return target_data
 
 
-def print_search(target_data: object) -> None:
+def print_search(target_data: dict) -> None:
     """Prints the data requested from the API.
 
     Args:
