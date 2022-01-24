@@ -44,6 +44,7 @@ node.add_command(ls)
 node.add_command(total)
 node.add_command(search)
 node.add_command(create)
+node.add_command(destroy)
 
 port.add_command(search)
 port.add_command(ls)
