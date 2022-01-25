@@ -2,7 +2,7 @@ import logging
 
 import click
 
-from xbot_commands.commands import create, ls, search, total
+from xbot_commands.commands import ancestors, create, descendants, ls, search, total
 
 FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
@@ -44,7 +44,8 @@ node.add_command(ls)
 node.add_command(total)
 node.add_command(search)
 node.add_command(create)
-node.add_command(destroy)
+node.add_command(descendants)
+node.add_command(ancestors)
 
 port.add_command(search)
 port.add_command(ls)

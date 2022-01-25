@@ -13,6 +13,7 @@ from xbot_commands.util_functions import (
     list_by_item_age,
     list_by_item_state,
     list_by_state_and_age,
+    print_lineage,
     print_search,
     request_data,
     search_by_id,
@@ -75,9 +76,11 @@ def search(ctx: object, name: str, id: str) -> None:
     target_item = sys.argv[1]
     argument = sys.argv[4]
     if ctx.params["name"] is not None:
-        search_by_name(target_item, argument)
+        response = search_by_name(target_item, argument)
+        print_search(response)
     elif ctx.params["id"] is not None:
-        search_by_id(target_item, argument)
+        response = search_by_id(target_item, argument)
+        print_search(response)
 
 
 @click.command()
@@ -103,7 +106,6 @@ def create(ctx: object, name: str, domain: str, cloud: str) -> None:
     headers["Accept"] = "application/vnd.pgrst.object+json"
     headers["Authorization"] = f"Bearer {access_token}"
     headers["Prefer"] = "return=representation"
-    name = ctx.params["name"]
     data = {
         "name": ctx.params["name"],
         "domain": ctx.params["domain"],
@@ -118,3 +120,34 @@ def create(ctx: object, name: str, domain: str, cloud: str) -> None:
         print(
             f"There was an error creating your node. Status code: {response.status_code}. Error message:{response.json()['message']}"
         )
+
+
+@click.command()
+@click.argument("id", type=str)
+def descendants(id: str) -> None:
+    """View the descendants of a node.
+
+    Args:
+        id (str): Node ID of the node you wish to view ancestors of.
+
+        Example: `xbot node descendants {node_id}`. Hint: If you're uncertain of the ID of a node, use the `xbot node ls` command to find it.
+    """
+    request_url = f"http://localhost:3000/ancestor_nodes?root_node_id=eq.{id}"
+    requested_data = request_data(request_url)
+    print_lineage(requested_data, id, "descendant")
+
+
+@click.command()
+@click.argument("id", type=str)
+def ancestors(id: str) -> None:
+    """View the ancestors of a node.
+
+    Args:
+        id (str): Node ID of the node you wish to view ancestors of.
+
+        Example: `xbot node ancestors {node_id}`. Hint: If you're uncertain of the ID of a node, use the `xbot node ls` command to find it.
+    """
+
+    request_url = f"http://localhost:3000/ancestor_nodes?descendant_node_id=eq.{id}"
+    requested_data = request_data(request_url)
+    print_lineage(requested_data, id, "ancestor")

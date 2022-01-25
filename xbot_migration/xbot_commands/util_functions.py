@@ -182,3 +182,21 @@ def search_by_name(target_item, argument):
     request_url = f"{base_url}?name=phfts.{argument}"
     target_data = request_data(request_url)
     return target_data
+
+
+def print_lineage(requested_data: list, id: str, target_lineage: str) -> None:
+    node = search_by_id(target_item="node", argument=id)
+    node_name = node[0]["name"]
+    table = Table(title=f"\{target_lineage} of {node_name} node \n")
+    table.add_column("Name", justify="left", style="cyan", no_wrap=True)
+    table.add_column("Category", justify="left", style="blue", no_wrap=False)
+    table.add_column("ID", justify="left", style="magenta", no_wrap=False)
+    n = 0
+    for item in requested_data:
+        n += 1
+        table.add_row(
+            f'{n}. {item[f"{target_lineage}_node_name"]}',
+            f'{item[f"{target_lineage}_node_category"]}',
+            f'{item[f"{target_lineage}_node_id"]}',
+        )
+    console.print(table)
