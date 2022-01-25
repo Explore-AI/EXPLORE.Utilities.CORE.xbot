@@ -39,14 +39,16 @@ console = Console(record=True)
 @click.option(
     "--age", help="list items provisioned within a certain timeframe", type=int
 )
+@click.option("--verbose", "-v", is_flag=True, help="print more output.")
 @click.pass_context
-def ls(ctx, state: str, age: int, count: int = 5) -> None:
+def ls(ctx, state: str, age: int, count: int = 5, verbose: bool = False) -> None:
     """List items in the mesh. Example: `xbot node ls --5` will list the 5 most recent items.
 
     Args:
         age (int): number of days search criteria should apply to.
         count (int): number of items to be listed. Defaults to 5 items.
         state (str): list items by state. Defaults to all states available.
+        verbose (bool): whether to print the data in JSON format. Defaults to False.
     """
     target = sys.argv[1]
     base_url = f"http://localhost:3000/{target}s"
@@ -55,21 +57,15 @@ def ls(ctx, state: str, age: int, count: int = 5) -> None:
     include_state = ctx.params["state"]
     include_age = ctx.params["age"]
     if include_state and include_age:
-        list_by_state_and_age(age, state, count, target)
+        list_by_state_and_age(age, state, count, target, verbose)
     elif include_state:
-        list_by_item_state(state, count, target)
+        list_by_item_state(state, count, target, verbose)
     elif include_age:
-        list_by_item_age(age, count, target)
+        list_by_item_age(age, count, target, verbose)
     elif include_count:
-        print_search(target_data[:count])
-        console.print(
-            "To view more verbose information about a specific node, you can [bold italic green]search by ID[/bold italic green] or [bold italic green]search by name[/bold italic green] using the [bold cyan]--json[/bold cyan] flag.\n"
-        )
-        console.print(
-            "Example: `xbot node search --id <node_id> --json` or `xbot node search --name <node_name> --json\n"
-        )
+        print_search(target_data[:count], verbose)
     else:
-        print_search(target_data)
+        print_search(target_data, verbose)
 
 
 @click.command()
@@ -77,13 +73,13 @@ def ls(ctx, state: str, age: int, count: int = 5) -> None:
 @click.option("--id", help="name of the node you're searching for")
 @click.option("--verbose", "-v", is_flag=True, help="print more output.")
 @click.pass_context
-def search(ctx: object, name: str, id: str, verbose) -> None:
+def search(ctx: object, name: str, id: str, verbose: bool) -> None:
     """Search for a specific item.
 
     Args:
         name (str): name of the item you're searching for
         id (str): ID of the item you're searching for
-        json (bool): output in json format if --json flag is supplied
+        verbose (bool): whether to print the data in JSON format. Defaults to False.
     """
     target_item = sys.argv[1]
     argument = sys.argv[4]

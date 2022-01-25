@@ -75,6 +75,7 @@ def print_search(target_data: dict, verbose: bool = False) -> None:
 
     Args:
         target_data (object): JSON object containing the data requested based on the base_url.
+        verbose (bool): whether to print the data in JSON format. Defaults to False.
     """
     if verbose:
         console.print_json(data=target_data)
@@ -121,7 +122,11 @@ def get_item_age(item: str) -> str:
 
 
 def list_by_state_and_age(
-    age: int, state: str = "active", count: int = 5, target: str = "node"
+    age: int,
+    state: str = "active",
+    count: int = 5,
+    target: str = "node",
+    verbose: bool = False,
 ):
     """List items based on their state AND age.
 
@@ -136,14 +141,16 @@ def list_by_state_and_age(
     request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}&{target}_state=eq.{state}"
     target_data = request_data(request_url)
     if target_data:
-        print_search(target_data[:count])
+        print_search(target_data[:count], verbose)
     else:
         logger.info(
             f"No {target}s of state '{state}' provisioned within the last {age} days. Please refine your search."
         )
 
 
-def list_by_item_state(state: str, count: int = 5, target: str = "node"):
+def list_by_item_state(
+    state: str, count: int = 5, target: str = "node", verbose: bool = False
+):
     """List items based on their state.
 
     Args:
@@ -155,12 +162,12 @@ def list_by_item_state(state: str, count: int = 5, target: str = "node"):
     request_url = f"{base_url}?select=*&{target}_state=eq.{state}"
     target_data = request_data(request_url)
     if target_data:
-        print_search(target_data[:count])
+        print_search(target_data[:count], verbose)
     else:
         logger.info(f"No {target}s with state '{state}' found.")
 
 
-def list_by_item_age(age: int, count: int, target: str = "node"):
+def list_by_item_age(age: int, count: int, target: str = "node", verbose: bool = False):
     """List items based on their age.
 
     Args:
@@ -174,7 +181,7 @@ def list_by_item_age(age: int, count: int, target: str = "node"):
     request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}"
     target_data = request_data(request_url)
     if target_data:
-        print_search(target_data[:count])
+        print_search(target_data[:count], verbose)
     else:
         logger.info(f"No {target}s provisioned within the last {age} days.")
 
