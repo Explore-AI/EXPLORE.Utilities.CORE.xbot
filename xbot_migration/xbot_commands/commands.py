@@ -63,7 +63,7 @@ def ls(ctx, state: str, age: int, count: int = 5) -> None:
     elif include_count:
         print_search(target_data[:count])
         console.print(
-            "To view verbose information about a specific node, you can [italic green]search by ID[/italic green] or [italic green]search by name[/italic green].\n"
+            "To view more verbose information about a specific node, you can [bold italic green]search by ID[/bold italic green] or [bold italic green]search by name[/bold italic green] using the [bold cyan]--json[/bold cyan] flag.\n"
         )
         console.print(
             "Example: `xbot node search --id <node_id> --json` or `xbot node search --name <node_name> --json\n"
@@ -75,9 +75,9 @@ def ls(ctx, state: str, age: int, count: int = 5) -> None:
 @click.command()
 @click.option("--name", help="name of the node you're searching for")
 @click.option("--id", help="name of the node you're searching for")
-@click.option("--json", help="output in json format", is_flag=True)
+@click.option("--verbose", "-v", is_flag=True, help="print more output.")
 @click.pass_context
-def search(ctx: object, name: str, id: str, json) -> None:
+def search(ctx: object, name: str, id: str, verbose) -> None:
     """Search for a specific item.
 
     Args:
@@ -87,20 +87,26 @@ def search(ctx: object, name: str, id: str, json) -> None:
     """
     target_item = sys.argv[1]
     argument = sys.argv[4]
-    if ctx.params["json"] is None:
+    if verbose:
         if ctx.params["name"] is not None:
             response = search_by_name(target_item, argument)
-            print_search(response)
+            console.print_json(data=response)
         elif ctx.params["id"] is not None:
             response = search_by_id(target_item, argument)
-            print_search(response)
+            console.print_json(data=response)
     else:
         if ctx.params["name"] is not None:
             response = search_by_name(target_item, argument)
-            console.print_json(data=response)
+            print_search(response)
+            console.print(
+                f"To view more verbose information about the {target_item}, append the [bold cyan]-v[/bold cyan] flag to the previous command.\n"
+            )
+            console.print(
+                f"Example: [bold]`xbot {target_item} search --name <{target_item}_name> -v`[/bold]\n"
+            )
         elif ctx.params["id"] is not None:
             response = search_by_id(target_item, argument)
-            console.print_json(data=response)
+            print_search(response)
 
 
 @click.command()
