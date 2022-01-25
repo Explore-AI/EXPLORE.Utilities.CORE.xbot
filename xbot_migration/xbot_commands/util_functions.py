@@ -70,25 +70,34 @@ def request_data(base_url: str) -> object:
     return target_data
 
 
-def print_search(target_data: dict) -> None:
+def print_search(target_data: dict, verbose: bool = False) -> None:
     """Prints the data requested from the API.
 
     Args:
         target_data (object): JSON object containing the data requested based on the base_url.
     """
-    table = Table(title="Results")
-    table.add_column("Name", justify="left", style="cyan", no_wrap=True)
-    table.add_column("State", justify="left", style="magenta", no_wrap=True)
-    table.add_column("Age (days)", justify="left", style="green", no_wrap=True)
-    table.add_column("ID", justify="left", style="blue", no_wrap=False)
-    n = 0
-    for item in target_data:
-        age = get_item_age(item)
-        n += 1
-        table.add_row(
-            f'{n}. {item["name"]}', f'{item["node_state"]}', f"{age}", f'{item["id"]}'
+    if verbose:
+        console.print_json(data=target_data)
+    else:
+        table = Table(title="Results")
+        table.add_column("Name", justify="left", style="cyan", no_wrap=True)
+        table.add_column("State", justify="left", style="magenta", no_wrap=True)
+        table.add_column("Age (days)", justify="left", style="green", no_wrap=True)
+        table.add_column("ID", justify="left", style="blue", no_wrap=False)
+        n = 0
+        for item in target_data:
+            age = get_item_age(item)
+            n += 1
+            table.add_row(
+                f'{n}. {item["name"]}',
+                f'{item["node_state"]}',
+                f"{age}",
+                f'{item["id"]}',
+            )
+        console.print(table)
+        console.print(
+            f"\nHint: To view more verbose information, append the [bold cyan]-v[/bold cyan] flag to the previous command.\n"
         )
-    console.print(table)
 
 
 def get_item_age(item: str) -> str:

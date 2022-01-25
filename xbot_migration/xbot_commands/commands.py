@@ -87,26 +87,12 @@ def search(ctx: object, name: str, id: str, verbose) -> None:
     """
     target_item = sys.argv[1]
     argument = sys.argv[4]
-    if verbose:
-        if ctx.params["name"] is not None:
-            response = search_by_name(target_item, argument)
-            console.print_json(data=response)
-        elif ctx.params["id"] is not None:
-            response = search_by_id(target_item, argument)
-            console.print_json(data=response)
-    else:
-        if ctx.params["name"] is not None:
-            response = search_by_name(target_item, argument)
-            print_search(response)
-            console.print(
-                f"To view more verbose information about the {target_item}, append the [bold cyan]-v[/bold cyan] flag to the previous command.\n"
-            )
-            console.print(
-                f"Example: [bold]`xbot {target_item} search --name <{target_item}_name> -v`[/bold]\n"
-            )
-        elif ctx.params["id"] is not None:
-            response = search_by_id(target_item, argument)
-            print_search(response)
+    if ctx.params["name"] is not None:
+        response = search_by_name(target_item, argument)
+        print_search(response, verbose)
+    elif ctx.params["id"] is not None:
+        response = search_by_id(target_item, argument)
+        print_search(response, verbose)
 
 
 @click.command()
