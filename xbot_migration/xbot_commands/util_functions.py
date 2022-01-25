@@ -187,6 +187,15 @@ def list_by_item_age(age: int, count: int, target: str = "node", verbose: bool =
 
 
 def search_by_id(target_item, argument):
+    """Search for an item by its ID.
+
+    Args:
+        target_item (str): the target item to be listed e.g. node, port or interface.
+        argument (str): the ID of the item to be searched for.
+
+    Returns:
+        list: a list of items matching the search criteria.
+    """
     base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?id=eq.{argument}"
     target_data = request_data(request_url)
@@ -194,6 +203,15 @@ def search_by_id(target_item, argument):
 
 
 def search_by_name(target_item, argument):
+    """Search for an item by its ID.
+
+    Args:
+        target_item (str): the target item to be listed e.g. node, port or interface.
+        argument (str): the name of the item to be searched for.
+
+    Returns:
+        list: a list of items matching the search criteria.
+    """
     base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?name=phfts.{argument}"
     target_data = request_data(request_url)
@@ -201,6 +219,15 @@ def search_by_name(target_item, argument):
 
 
 def search_by_type(target_item, argument):
+    """Search for an item by its ID.
+
+    Args:
+        target_item (str): the target item to be listed e.g. node, port or interface.
+        argument (str): the type of the item to be searched for. Options = ["operational", "enrichment"]
+
+    Returns:
+        list: a list of items matching the search criteria.
+    """
     base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?{target_item}_type=eq.{argument}"
     target_data = request_data(request_url)
@@ -208,6 +235,13 @@ def search_by_type(target_item, argument):
 
 
 def print_lineage(requested_data: list, id: str, target_lineage: str) -> None:
+    """Prints the lineage, i.e. ancestors or descendants, of an item.
+
+    Args:
+        requested_data (list): a list of items matching the search criteria.
+        id (str): ID of the item you want to print the lineage for.
+        target_lineage (str): ancestor or descendant.
+    """
     node = search_by_id(target_item="node", argument=id)
     node_name = node[0]["name"]
     table = Table(title=f"\{target_lineage} of {node_name} node \n")
