@@ -33,6 +33,7 @@ console = Console(record=True)
 
 
 @click.command()
+@click.option("--all", "-a", help="list all items", is_flag=True)
 @click.option("--count", help="number of items to be listed", type=int)
 @click.option("--state", help="list items by state", type=click.Choice(ITEM_STATES))
 @click.option(
@@ -40,7 +41,9 @@ console = Console(record=True)
 )
 @click.option("--verbose", "-v", is_flag=True, help="print more output.")
 @click.pass_context
-def ls(ctx, state: str, age: int, count: int = 5, verbose: bool = False) -> None:
+def ls(
+    ctx, all: str, state: str, age: int, count: int = 5, verbose: bool = False
+) -> None:
     """List items in the mesh. Example: `xbot node ls --5` will list the 5 most recent items.
 
     Args:
@@ -63,8 +66,12 @@ def ls(ctx, state: str, age: int, count: int = 5, verbose: bool = False) -> None
         list_by_item_age(age, count, target, verbose)
     elif include_count:
         print_search(target_data[:count], verbose)
-    else:
+    elif all:
         print_search(target_data, verbose)
+    else:
+        console.print(
+            f"Hmm, I'm not sure what you want me to do. Try [bold green]`xbot {target} ls --all`[/bold green] to view all {target}s, or [bold green]`xbot {target} ls --help`[/bold green] for more options."
+        )
 
 
 @click.command()
@@ -146,7 +153,8 @@ def create(ctx: object, name: str, domain: str, cloud: str) -> None:
 
 @click.command()
 @click.argument("id", type=str)
-def descendants(id: str) -> None:
+@click.option("--tree", is_flag=True, help="print as ancestore tree")
+def descendants(id: str, tree: bool = False) -> None:
     """View the descendants of a node.
 
     Args:
@@ -156,12 +164,13 @@ def descendants(id: str) -> None:
     """
     request_url = f"http://localhost:3000/ancestor_nodes?root_node_id=eq.{id}"
     requested_data = request_data(request_url)
-    print_lineage(requested_data, id, "descendant")
+    print_lineage(requested_data, id, "descendant", tree)
 
 
 @click.command()
 @click.argument("id", type=str)
-def ancestors(id: str) -> None:
+@click.option("--tree", is_flag=True, help="print as ancestore tree")
+def ancestors(id: str, tree: bool = False) -> None:
     """View the ancestors of a node.
 
     Args:
@@ -172,4 +181,4 @@ def ancestors(id: str) -> None:
 
     request_url = f"http://localhost:3000/ancestor_nodes?descendant_node_id=eq.{id}"
     requested_data = request_data(request_url)
-    print_lineage(requested_data, id, "ancestor")
+    print_lineage(requested_data, id, "ancestor", tree)

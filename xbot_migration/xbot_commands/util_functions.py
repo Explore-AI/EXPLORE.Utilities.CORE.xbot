@@ -13,6 +13,7 @@ from rich import print
 from rich.console import Console
 from rich.style import Style
 from rich.table import Table
+from rich.tree import Tree
 
 load_dotenv()
 
@@ -233,7 +234,9 @@ def search_by_type(target_item, argument):
     return target_data
 
 
-def print_lineage(requested_data: list, id: str, target_lineage: str) -> None:
+def print_lineage(
+    requested_data: list, id: str, target_lineage: str, tree: bool = False
+) -> None:
     """Prints the lineage, i.e. ancestors or descendants, of an item.
 
     Args:
@@ -243,16 +246,24 @@ def print_lineage(requested_data: list, id: str, target_lineage: str) -> None:
     """
     node = search_by_id(target_item="node", argument=id)
     node_name = node[0]["name"]
-    table = Table(title=f"\{target_lineage} of {node_name} node \n")
-    table.add_column("Name", justify="left", style="cyan", no_wrap=True)
-    table.add_column("Category", justify="left", style="blue", no_wrap=False)
-    table.add_column("ID", justify="left", style="magenta", no_wrap=False)
-    n = 0
-    for item in requested_data:
-        n += 1
-        table.add_row(
-            f'{n}. {item[f"{target_lineage}_node_name"]}',
-            f'{item[f"{target_lineage}_node_category"]}',
-            f'{item[f"{target_lineage}_node_id"]}',
+    if tree:
+        tree = Tree(
+            f"[bold cyan]{target_lineage.upper()}S[/bold cyan] of the [bold cyan]{node_name}[/bold cyan] node"
         )
-    console.print(table)
+        for item in requested_data:
+            tree.add(f'{item[f"{target_lineage}_node_name"]}')
+        print(tree)
+    else:
+        table = Table(title=f"\{target_lineage} of {node_name} node \n")
+        table.add_column("Name", justify="left", style="cyan", no_wrap=True)
+        table.add_column("Category", justify="left", style="blue", no_wrap=False)
+        table.add_column("ID", justify="left", style="magenta", no_wrap=False)
+        n = 0
+        for item in requested_data:
+            n += 1
+            table.add_row(
+                f'{n}. {item[f"{target_lineage}_node_name"]}',
+                f'{item[f"{target_lineage}_node_category"]}',
+                f'{item[f"{target_lineage}_node_id"]}',
+            )
+        console.print(table)
