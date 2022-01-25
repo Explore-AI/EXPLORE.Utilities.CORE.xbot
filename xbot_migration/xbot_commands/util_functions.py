@@ -200,6 +200,13 @@ def search_by_name(target_item, argument):
     return target_data
 
 
+def search_by_type(target_item, argument):
+    base_url = f"http://localhost:3000/{target_item}s"
+    request_url = f"{base_url}?{target_item}_type=eq.{argument}"
+    target_data = request_data(request_url)
+    return target_data
+
+
 def print_lineage(requested_data: list, id: str, target_lineage: str) -> None:
     node = search_by_id(target_item="node", argument=id)
     node_name = node[0]["name"]

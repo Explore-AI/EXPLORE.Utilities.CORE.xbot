@@ -1,5 +1,3 @@
-import datetime
-import json
 import logging
 import sys
 
@@ -9,7 +7,6 @@ import requests
 from requests.structures import CaseInsensitiveDict
 from rich import print
 from rich.console import Console
-from rich.json import JSON
 
 from xbot_commands.util_functions import (
     get_access_token,
@@ -21,6 +18,7 @@ from xbot_commands.util_functions import (
     request_data,
     search_by_id,
     search_by_name,
+    search_by_type,
 )
 
 FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
@@ -28,6 +26,7 @@ VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
 
 ITEM_STATES = ["provisioned", "started", "active", "error", "stopped", "suspended"]
 CLOUD_PROVIDERS = ["aws", "azure", "gcp"]
+ITEM_TYPES = ["operational", "enrichment"]
 
 logger = logging.getLogger()
 console = Console(record=True)
@@ -71,9 +70,14 @@ def ls(ctx, state: str, age: int, count: int = 5, verbose: bool = False) -> None
 @click.command()
 @click.option("--name", help="name of the node you're searching for")
 @click.option("--id", help="name of the node you're searching for")
+@click.option(
+    "--type",
+    help="type of the node you're searching for",
+    type=click.Choice(ITEM_TYPES),
+)
 @click.option("--verbose", "-v", is_flag=True, help="print more output.")
 @click.pass_context
-def search(ctx: object, name: str, id: str, verbose: bool) -> None:
+def search(ctx: object, name: str, id: str, type: str, verbose: bool) -> None:
     """Search for a specific item.
 
     Args:
@@ -89,15 +93,24 @@ def search(ctx: object, name: str, id: str, verbose: bool) -> None:
     elif ctx.params["id"] is not None:
         response = search_by_id(target_item, argument)
         print_search(response, verbose)
+    elif ctx.params["type"] is not None:
+        response = search_by_type(target_item, argument)
+        print_search(response, verbose)
 
 
 @click.command()
+@click.option(
+    "--type", help="type of node you're creating", type=click.Choice(ITEM_TYPES)
+)
 def total() -> None:
     """This command lists the total number of items present in the mesh. Example: `xbot node list --total` will list the total number of items in the mesh."""
     target = sys.argv[1]
     base_url = f"http://localhost:3000/{target}s"
     target_data = request_data(base_url)
-    logger.info(f"The total number of {target}s in your mesh is: {len(target_data)}")
+    console.print(
+        f"The total number of {target}s in your mesh is: [bold red]{len(target_data)} [/bold red]"
+        + "\n"
+    )
 
 
 @click.command()
