@@ -83,6 +83,7 @@ def search(ctx: object, name: str, id: str, json) -> None:
     Args:
         name (str): name of the item you're searching for
         id (str): ID of the item you're searching for
+        json (bool): output in json format if --json flag is supplied
     """
     target_item = sys.argv[1]
     argument = sys.argv[4]
