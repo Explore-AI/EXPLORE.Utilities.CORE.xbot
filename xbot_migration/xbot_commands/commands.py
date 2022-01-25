@@ -7,6 +7,9 @@ import click
 import requests
 
 from requests.structures import CaseInsensitiveDict
+from rich import print
+from rich.console import Console
+from rich.json import JSON
 
 from xbot_commands.util_functions import (
     get_access_token,
@@ -27,6 +30,7 @@ ITEM_STATES = ["provisioned", "started", "active", "error", "stopped", "suspende
 CLOUD_PROVIDERS = ["aws", "azure", "gcp"]
 
 logger = logging.getLogger()
+console = Console(record=True)
 
 
 @click.command()
@@ -58,6 +62,12 @@ def ls(ctx, state: str, age: int, count: int = 5) -> None:
         list_by_item_age(age, count, target)
     elif include_count:
         print_search(target_data[:count])
+        console.print(
+            "To view verbose information about a specific node, you can [italic green]search by ID[/italic green] or [italic green]search by name[/italic green].\n"
+        )
+        console.print(
+            "Example: `xbot node search --id <node_id> --json` or `xbot node search --name <node_name> --json\n"
+        )
     else:
         print_search(target_data)
 
@@ -65,8 +75,9 @@ def ls(ctx, state: str, age: int, count: int = 5) -> None:
 @click.command()
 @click.option("--name", help="name of the node you're searching for")
 @click.option("--id", help="name of the node you're searching for")
+@click.option("--json", help="output in json format", is_flag=True)
 @click.pass_context
-def search(ctx: object, name: str, id: str) -> None:
+def search(ctx: object, name: str, id: str, json) -> None:
     """Search for a specific item.
 
     Args:
@@ -75,12 +86,20 @@ def search(ctx: object, name: str, id: str) -> None:
     """
     target_item = sys.argv[1]
     argument = sys.argv[4]
-    if ctx.params["name"] is not None:
-        response = search_by_name(target_item, argument)
-        print_search(response)
-    elif ctx.params["id"] is not None:
-        response = search_by_id(target_item, argument)
-        print_search(response)
+    if ctx.params["json"] is None:
+        if ctx.params["name"] is not None:
+            response = search_by_name(target_item, argument)
+            print_search(response)
+        elif ctx.params["id"] is not None:
+            response = search_by_id(target_item, argument)
+            print_search(response)
+    else:
+        if ctx.params["name"] is not None:
+            response = search_by_name(target_item, argument)
+            console.print_json(data=response)
+        elif ctx.params["id"] is not None:
+            response = search_by_id(target_item, argument)
+            console.print_json(data=response)
 
 
 @click.command()
@@ -114,7 +133,7 @@ def create(ctx: object, name: str, domain: str, cloud: str) -> None:
     }
     response = requests.post(base_url, headers=headers, data=data)
     if response.status_code == 201:
-        print("\nSuccess!\n")
+        console.print("Node successfully created")
         search_by_name(target, ctx.params["name"])
     else:
         print(
