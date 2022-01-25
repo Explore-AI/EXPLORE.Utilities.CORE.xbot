@@ -52,22 +52,22 @@ def ls(
         state (str): list items by state. Defaults to all states available.
         verbose (bool): whether to print the data in JSON format. Defaults to False.
     """
-    target = sys.argv[1]
-    base_url = f"http://localhost:3000/{target}s"
-    target_data = request_data(base_url)
+    target_item = sys.argv[1]
+    base_url = f"http://localhost:3000/{target_item}s"
+    response_data = request_data(base_url)
     if state and age:
-        list_by_state_and_age(age, state, count, target, verbose)
+        list_by_state_and_age(age, state, count, target_item, verbose)
     elif state:
-        list_by_item_state(state, count, target, verbose)
+        list_by_item_state(state, count, target_item, verbose)
     elif age:
-        list_by_item_age(age, count, target, verbose)
+        list_by_item_age(age, count, target_item, verbose)
     elif count:
-        print_search(target_data[:count], verbose)
+        print_search(response_data[:count], verbose)
     elif all:
-        print_search(target_data, verbose)
+        print_search(response_data, verbose)
     else:
         console.print(
-            f"Hmm, I'm not sure what you want me to do. Try [bold green]`xbot {target} ls --all`[/bold green] to view all {target}s, or [bold green]`xbot {target} ls --help`[/bold green] for more options."
+            f"Hmm, I'm not sure what you want me to do. Try [bold green]`xbot {target_item} ls --all`[/bold green] to view all {target_item}s, or [bold green]`xbot {target_item} ls --help`[/bold green] for more options."
         )
 
 
@@ -92,24 +92,24 @@ def search(ctx: object, name: str, id: str, type: str, verbose: bool) -> None:
     target_item = sys.argv[1]
     argument = sys.argv[4]
     if name:
-        response = search_by_name(target_item, argument)
-        print_search(response, verbose)
+        response_data = search_by_name(target_item, argument)
+        print_search(response_data, verbose)
     elif id:
-        response = search_by_id(target_item, argument)
-        print_search(response, verbose)
+        response_data = search_by_id(target_item, argument)
+        print_search(response_data, verbose)
     elif type:
-        response = search_by_type(target_item, argument)
-        print_search(response, verbose)
+        response_data = search_by_type(target_item, argument)
+        print_search(response_data, verbose)
 
 
 @click.command()
 def total() -> None:
     """This command lists the total number of items present in the mesh. Example: `xbot node list --total` will list the total number of items in the mesh."""
-    target = sys.argv[1]
-    base_url = f"http://localhost:3000/{target}s"
-    target_data = request_data(base_url)
+    target_item = sys.argv[1]
+    base_url = f"http://localhost:3000/{target_item}s"
+    response_data = request_data(base_url)
     console.print(
-        f"The total number of {target}s in your mesh is: [bold red]{len(target_data)} [/bold red]"
+        f"The total number of {target_item}s in your mesh is: [bold red]{len(response_data)} [/bold red]"
         + "\n"
     )
 
@@ -126,8 +126,8 @@ def total() -> None:
 def create(ctx: object, name: str, domain: str, cloud: str) -> None:
     """This command creates a new item in the mesh. Example: `xbot node create --name "my_node" --domain "waste.water" --cloud aws` will create a new node."""
     access_token = get_access_token()
-    target = sys.argv[1]
-    base_url = f"http://localhost:3000/{target}s"
+    target_item = sys.argv[1]
+    base_url = f"http://localhost:3000/{target_item}s"
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/vnd.pgrst.object+json"
     headers["Authorization"] = f"Bearer {access_token}"
@@ -139,13 +139,13 @@ def create(ctx: object, name: str, domain: str, cloud: str) -> None:
         "node_cloud_provider": cloud,
     }
 
-    response = requests.post(base_url, headers=headers, data=data)
-    if response.status_code == 201:
+    response_data = requests.post(base_url, headers=headers, data=data)
+    if response_data.status_code == 201:
         console.print("[bold green]Node successfully created[/bold green]\n")
-        search_by_name(target, name)
+        search_by_name(target_item, name)
     else:
         print(
-            f"There was an error creating your node. Status code: {response.status_code}. Error message:{response.json()['message']}"
+            f"There was an error creating your node. Status code: {response_data.status_code}. Error message:{response_data.json()['message']}"
         )
 
 

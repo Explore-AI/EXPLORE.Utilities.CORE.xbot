@@ -66,19 +66,19 @@ def request_data(base_url: str) -> object:
     headers["Accept"] = "application/json"
     headers["Authorization"] = f"Bearer {access_token}"
     response = requests.get(request_url, headers=headers)
-    target_data = json.loads(response.text)
-    return target_data
+    response_data = json.loads(response.text)
+    return response_data
 
 
-def print_search(target_data: dict, verbose: bool = False) -> None:
+def print_search(response_data: dict, verbose: bool = False) -> None:
     """Prints the data requested from the API.
 
     Args:
-        target_data (object): JSON object containing the data requested based on the base_url.
+        response_data (object): JSON object containing the data requested based on the base_url.
         verbose (bool): whether to print the data in JSON format. Defaults to False.
     """
     if verbose:
-        console.print_json(data=target_data)
+        console.print_json(data=response_data)
     else:
         table = Table(title="Results")
         table.add_column("Name", justify="left", style="cyan", no_wrap=True)
@@ -86,7 +86,7 @@ def print_search(target_data: dict, verbose: bool = False) -> None:
         table.add_column("Age (days)", justify="left", style="green", no_wrap=True)
         table.add_column("ID", justify="left", style="blue", no_wrap=False)
         n = 0
-        for item in target_data:
+        for item in response_data:
             age = get_item_age(item)
             n += 1
             table.add_row(
@@ -125,7 +125,7 @@ def list_by_state_and_age(
     age: int,
     state: str = "active",
     count: int = 5,
-    target: str = "node",
+    target_item: str = "node",
     verbose: bool = False,
 ):
     """List items based on their state AND age.
@@ -134,56 +134,58 @@ def list_by_state_and_age(
         age (int): number of days search criteria should apply to.
         state (string): ["provisioned", "started", "active", "error", "stopped", "suspended"]
         count (int): number of items to be listed. Defaults to 5 items.
-        target (str): the target item to be listed e.g. node, port or interface. Defaults to node.
+        target_item (str): the target item to be listed e.g. node, port or interface. Defaults to node.
     """
     from_datetime = datetime.datetime.now() - datetime.timedelta(age)
-    base_url = f"http://localhost:3000/{target}s"
-    request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}&{target}_state=eq.{state}"
-    target_data = request_data(request_url)
-    if target_data:
-        print_search(target_data[:count], verbose)
+    base_url = f"http://localhost:3000/{target_item}s"
+    request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}&{target_item}_state=eq.{state}"
+    response_data = request_data(request_url)
+    if response_data:
+        print_search(response_data[:count], verbose)
     else:
         logger.info(
-            f"No {target}s of state '{state}' provisioned within the last {age} days. Please refine your search."
+            f"No {target_item}s of state '{state}' provisioned within the last {age} days. Please refine your search."
         )
 
 
 def list_by_item_state(
-    state: str, count: int = 5, target: str = "node", verbose: bool = False
+    state: str, count: int = 5, target_item: str = "node", verbose: bool = False
 ):
     """List items based on their state.
 
     Args:
         state (string): ["provisioned", "started", "active", "error", "stopped", "suspended"]
         count (int): number of items to be listed. Defaults to 5 items.
-        target (str): the target item to be listed e.g. node, port or interface. Defaults to node.
+        target_item (str): the target item to be listed e.g. node, port or interface. Defaults to node.
     """
-    base_url = f"http://localhost:3000/{target}s"
-    request_url = f"{base_url}?select=*&{target}_state=eq.{state}"
-    target_data = request_data(request_url)
-    if target_data:
-        print_search(target_data[:count], verbose)
+    base_url = f"http://localhost:3000/{target_item}s"
+    request_url = f"{base_url}?select=*&{target_item}_state=eq.{state}"
+    response_data = request_data(request_url)
+    if response_data:
+        print_search(response_data[:count], verbose)
     else:
-        logger.info(f"No {target}s with state '{state}' found.")
+        logger.info(f"No {target_item}s with state '{state}' found.")
 
 
-def list_by_item_age(age: int, count: int, target: str = "node", verbose: bool = False):
+def list_by_item_age(
+    age: int, count: int, target_item: str = "node", verbose: bool = False
+):
     """List items based on their age.
 
     Args:
         age (int): number of days search criteria should apply to.
         state (string): ["provisioned", "started", "active", "error", "stopped", "suspended"]
         count (int): number of items to be listed. Defaults to 5 items.
-        target (str): the target item to be listed e.g. node, port or interface. Defaults to node.
+        target_item (str): the target item to be listed e.g. node, port or interface. Defaults to node.
     """
     from_datetime = datetime.datetime.now() - datetime.timedelta(age)
-    base_url = f"http://localhost:3000/{target}s"
+    base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}"
-    target_data = request_data(request_url)
-    if target_data:
-        print_search(target_data[:count], verbose)
+    response_data = request_data(request_url)
+    if response_data:
+        print_search(response_data[:count], verbose)
     else:
-        logger.info(f"No {target}s provisioned within the last {age} days.")
+        logger.info(f"No {target_item}s provisioned within the last {age} days.")
 
 
 def search_by_id(target_item, argument):
@@ -198,8 +200,8 @@ def search_by_id(target_item, argument):
     """
     base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?id=eq.{argument}"
-    target_data = request_data(request_url)
-    return target_data
+    response_data = request_data(request_url)
+    return response_data
 
 
 def search_by_name(target_item, argument):
@@ -214,8 +216,8 @@ def search_by_name(target_item, argument):
     """
     base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?name=phfts.{argument}"
-    target_data = request_data(request_url)
-    return target_data
+    response_data = request_data(request_url)
+    return response_data
 
 
 def search_by_type(target_item, argument):
@@ -230,17 +232,17 @@ def search_by_type(target_item, argument):
     """
     base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?{target_item}_type=eq.{argument}"
-    target_data = request_data(request_url)
-    return target_data
+    response_data = request_data(request_url)
+    return response_data
 
 
 def print_lineage(
-    requested_data: list, id: str, target_lineage: str, tree: bool = False
+    response_data: list, id: str, target_lineage: str, tree: bool = False
 ) -> None:
     """Prints the lineage, i.e. ancestors or descendants, of an item.
 
     Args:
-        requested_data (list): a list of items matching the search criteria.
+        response_data (list): a list of items matching the search criteria.
         id (str): ID of the item you want to print the lineage for.
         target_lineage (str): ancestor or descendant.
     """
@@ -250,7 +252,7 @@ def print_lineage(
         tree = Tree(
             f"[bold cyan]{target_lineage.upper()}S[/bold cyan] of the [bold cyan]{node_name}[/bold cyan] node"
         )
-        for item in requested_data:
+        for item in response_data:
             tree.add(f'{item[f"{target_lineage}_node_name"]}')
         print(tree)
     else:
@@ -259,7 +261,7 @@ def print_lineage(
         table.add_column("Category", justify="left", style="blue", no_wrap=False)
         table.add_column("ID", justify="left", style="magenta", no_wrap=False)
         n = 0
-        for item in requested_data:
+        for item in response_data:
             n += 1
             table.add_row(
                 f'{n}. {item[f"{target_lineage}_node_name"]}',
