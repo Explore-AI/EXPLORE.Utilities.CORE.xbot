@@ -55,16 +55,13 @@ def ls(
     target = sys.argv[1]
     base_url = f"http://localhost:3000/{target}s"
     target_data = request_data(base_url)
-    include_count = ctx.params["count"]
-    include_state = ctx.params["state"]
-    include_age = ctx.params["age"]
-    if include_state and include_age:
+    if state and age:
         list_by_state_and_age(age, state, count, target, verbose)
-    elif include_state:
+    elif state:
         list_by_item_state(state, count, target, verbose)
-    elif include_age:
+    elif age:
         list_by_item_age(age, count, target, verbose)
-    elif include_count:
+    elif count:
         print_search(target_data[:count], verbose)
     elif all:
         print_search(target_data, verbose)
@@ -145,7 +142,7 @@ def create(ctx: object, name: str, domain: str, cloud: str) -> None:
     response = requests.post(base_url, headers=headers, data=data)
     if response.status_code == 201:
         console.print("[bold green]Node successfully created[/bold green]\n")
-        search_by_name(target, ctx.params["name"])
+        search_by_name(target, name)
     else:
         print(
             f"There was an error creating your node. Status code: {response.status_code}. Error message:{response.json()['message']}"
