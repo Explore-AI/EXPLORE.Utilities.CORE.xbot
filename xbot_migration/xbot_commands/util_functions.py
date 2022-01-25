@@ -11,7 +11,6 @@ from dotenv import load_dotenv
 from requests.structures import CaseInsensitiveDict
 from rich import print
 from rich.console import Console
-from rich.progress import track
 from rich.style import Style
 from rich.table import Table
 

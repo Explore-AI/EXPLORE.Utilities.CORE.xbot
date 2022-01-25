@@ -87,13 +87,13 @@ def search(ctx: object, name: str, id: str, type: str, verbose: bool) -> None:
     """
     target_item = sys.argv[1]
     argument = sys.argv[4]
-    if ctx.params["name"] is not None:
+    if name:
         response = search_by_name(target_item, argument)
         print_search(response, verbose)
-    elif ctx.params["id"] is not None:
+    elif id:
         response = search_by_id(target_item, argument)
         print_search(response, verbose)
-    elif ctx.params["type"] is not None:
+    elif type:
         response = search_by_type(target_item, argument)
         print_search(response, verbose)
 
@@ -128,14 +128,15 @@ def create(ctx: object, name: str, domain: str, cloud: str) -> None:
     headers["Authorization"] = f"Bearer {access_token}"
     headers["Prefer"] = "return=representation"
     data = {
-        "name": ctx.params["name"],
-        "domain": ctx.params["domain"],
+        "name": name,
+        "domain": domain,
         "description": "Created by xbot",
-        "node_cloud_provider": ctx.params["cloud"],
+        "node_cloud_provider": cloud,
     }
+
     response = requests.post(base_url, headers=headers, data=data)
     if response.status_code == 201:
-        console.print("Node successfully created")
+        console.print("[bold green]Node successfully created[/bold green]\n")
         search_by_name(target, ctx.params["name"])
     else:
         print(
