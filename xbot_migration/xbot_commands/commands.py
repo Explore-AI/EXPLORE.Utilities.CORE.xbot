@@ -75,8 +75,8 @@ def ls(
 
 
 @click.command()
-@click.option("--name", help="name of the node you're searching for")
-@click.option("--id", help="name of the node you're searching for")
+@click.option("--name", "-n", help="name of the node you're searching for")
+@click.option("--id", "-id", help="name of the node you're searching for")
 @click.option(
     "--type",
     help="type of the node you're searching for",
@@ -106,9 +106,6 @@ def search(ctx: object, name: str, id: str, type: str, verbose: bool) -> None:
 
 
 @click.command()
-@click.option(
-    "--type", help="type of node you're creating", type=click.Choice(ITEM_TYPES)
-)
 def total() -> None:
     """This command lists the total number of items present in the mesh. Example: `xbot node list --total` will list the total number of items in the mesh."""
     target = sys.argv[1]
@@ -121,9 +118,13 @@ def total() -> None:
 
 
 @click.command()
-@click.option("--name", help="name of the node you're creating", type=str)
-@click.option("--domain", help="domain of the node you're creating", type=str)
-@click.option("--cloud", help="cloud provider", type=click.Choice(CLOUD_PROVIDERS))
+@click.option("--name", "-n", help="name of the item you're creating", type=str)
+@click.option("--domain", help="domain of the item you're creating", type=str)
+@click.option(
+    "--cloud",
+    help="cloud provider that the item is hosted on",
+    type=click.Choice(CLOUD_PROVIDERS),
+)
 @click.pass_context
 def create(ctx: object, name: str, domain: str, cloud: str) -> None:
     """This command creates a new item in the mesh. Example: `xbot node create --name "my_node" --domain "waste.water" --cloud aws` will create a new node."""
@@ -153,7 +154,7 @@ def create(ctx: object, name: str, domain: str, cloud: str) -> None:
 
 @click.command()
 @click.argument("id", type=str)
-@click.option("--tree", is_flag=True, help="print as ancestore tree")
+@click.option("--tree", is_flag=True, help="print as ancestor tree")
 def descendants(id: str, tree: bool = False) -> None:
     """View the descendants of a node.
 
