@@ -238,7 +238,7 @@ def search_by_type(target_item, argument):
     return response_data
 
 
-def fetch_descendants(id):
+def fetch_lineage(id):
     request_url = f"http://localhost:3000/ancestor_nodes?root_node_id=eq.{id}"
     requested_data = request_data(request_url)
     return requested_data
@@ -276,12 +276,16 @@ def print_lineage(
         table.add_column("Name", justify="left", style="cyan", no_wrap=True)
         table.add_column("Category", justify="left", style="blue", no_wrap=False)
         table.add_column("ID", justify="left", style="magenta", no_wrap=False)
+        table_items = [node_name]
         n = 0
         for item in response_data:
-            n += 1
-            table.add_row(
-                f'{n}. {item[f"{target_lineage}_node_name"]}',
-                f'{item[f"{target_lineage}_node_category"]}',
-                f'{item[f"{target_lineage}_node_id"]}',
-            )
+            item_name = item[f"{target_lineage}_node_name"]
+            if item_name not in table_items:
+                n += 1
+                table.add_row(
+                    f'{n}: {item[f"{target_lineage}_node_name"]}',
+                    f'{item[f"{target_lineage}_node_category"]}',
+                    f'{item[f"{target_lineage}_node_id"]}',
+                )
+                table_items.append(item_name)
         console.print(table)

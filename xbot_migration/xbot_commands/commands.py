@@ -9,7 +9,7 @@ from rich import print
 from rich.console import Console
 
 from xbot_commands.util_functions import (
-    fetch_descendants,
+    fetch_lineage,
     get_access_token,
     list_by_item_age,
     list_by_item_state,
@@ -161,13 +161,13 @@ def descendants(id: str, tree: bool = False) -> None:
 
         Example: `xbot node descendants {node_id}`. Hint: If you're uncertain of the ID of a node, use the `xbot node ls` command to find it.
     """
-    requested_data = fetch_descendants(id)
+    requested_data = fetch_lineage(id)
     print_lineage(requested_data, id, "descendant", tree)
 
 
 @click.command()
 @click.argument("id", type=str)
-@click.option("--tree", is_flag=True, help="print as ancestore tree")
+@click.option("--tree", is_flag=True, help="print as ancestor tree")
 def ancestors(id: str, tree: bool = False) -> None:
     """View the ancestors of a node.
 
@@ -177,6 +177,5 @@ def ancestors(id: str, tree: bool = False) -> None:
         Example: `xbot node ancestors {node_id}`. Hint: If you're uncertain of the ID of a node, use the `xbot node ls` command to find it.
     """
 
-    request_url = f"http://localhost:3000/ancestor_nodes?descendant_node_id=eq.{id}"
-    requested_data = request_data(request_url)
+    requested_data = fetch_lineage(id)
     print_lineage(requested_data, id, "ancestor", tree)
