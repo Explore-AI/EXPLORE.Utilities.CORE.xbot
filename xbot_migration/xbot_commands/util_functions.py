@@ -238,7 +238,15 @@ def search_by_type(target_item, argument):
     return response_data
 
 
-def fetch_lineage(id):
+def fetch_lineage(id: str) -> list:
+    """Fetch the ancestors and descendants of an item.
+
+    Args:
+        id (str): ID of item you're looking for the lineage of.
+
+    Returns:
+        [list]: a list of items matching the search criteria.
+    """
     request_url = f"http://localhost:3000/ancestor_nodes?root_node_id=eq.{id}"
     requested_data = request_data(request_url)
     return requested_data
