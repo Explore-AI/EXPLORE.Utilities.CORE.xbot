@@ -3,6 +3,8 @@ import json
 import logging
 import os
 
+from typing import ItemsView
+
 import click
 import pytz
 import requests
@@ -259,29 +261,15 @@ def print_lineage(
     node = search_by_id(target_item="node", argument=id)
     node_name = node[0]["name"]
     if tree:
+        tree_items = [node_name]
         tree = Tree(
-            f"[bold cyan]{target_lineage.upper()}S[/bold cyan] of the [bold cyan]{node_name}[/bold cyan] node"
+            f"[bold cyan]{target_lineage.upper()} TREE: {node_name.upper()}[/bold cyan]"
         )
         for item in response_data:
-            tree.add(f'{item[f"{target_lineage}_node_name"]}')
-        print(tree)
-    elif tree and all:
-        tree = Tree(
-            f"[bold cyan]{target_lineage.upper()} TREE[/bold cyan] - {node_name}",
-        )
-        for item in response_data:
-            descendants = fetch_descendants(item[f"{target_lineage}_node_id"])
-            baz_tree = tree.add(
-                f"[bold blue]{item[f'{target_lineage}_node_name']}[/bold blue]"
-            )
-            for descendant in descendants:
-                if (
-                    descendant[f"{target_lineage}_node_name"]
-                    == item[f"{target_lineage}_node_name"]
-                ):
-                    pass
-                else:
-                    baz_tree.add(f'{descendant[f"{target_lineage}_node_name"]}')
+            item_name = item[f"{target_lineage}_node_name"]
+            if item_name not in tree_items:
+                tree.add(item_name)
+                tree_items.append(item_name)
         print(tree)
     else:
         table = Table(title=f"\{target_lineage} of {node_name} node \n")
