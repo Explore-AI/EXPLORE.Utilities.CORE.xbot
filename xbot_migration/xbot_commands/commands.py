@@ -9,6 +9,7 @@ from rich import print
 from rich.console import Console
 
 from xbot_commands.util_functions import (
+    fetch_descendants,
     get_access_token,
     list_by_item_age,
     list_by_item_state,
@@ -152,7 +153,8 @@ def create(ctx: object, name: str, domain: str, cloud: str) -> None:
 @click.command()
 @click.argument("id", type=str)
 @click.option("--tree", is_flag=True, help="print as ancestor tree")
-def descendants(id: str, tree: bool = False) -> None:
+@click.option("--all", is_flag=True, help="print dependency tree")
+def descendants(id: str, tree: bool = False, all: bool = False) -> None:
     """View the descendants of a node.
 
     Args:
@@ -160,15 +162,15 @@ def descendants(id: str, tree: bool = False) -> None:
 
         Example: `xbot node descendants {node_id}`. Hint: If you're uncertain of the ID of a node, use the `xbot node ls` command to find it.
     """
-    request_url = f"http://localhost:3000/ancestor_nodes?root_node_id=eq.{id}"
-    requested_data = request_data(request_url)
-    print_lineage(requested_data, id, "descendant", tree)
+    requested_data = fetch_descendants(id)
+    print_lineage(requested_data, id, "descendant", tree, all)
 
 
 @click.command()
 @click.argument("id", type=str)
 @click.option("--tree", is_flag=True, help="print as ancestore tree")
-def ancestors(id: str, tree: bool = False) -> None:
+@click.option("--all", is_flag=True, help="print dependency tree")
+def ancestors(id: str, tree: bool = False, all: bool = False) -> None:
     """View the ancestors of a node.
 
     Args:
@@ -179,4 +181,4 @@ def ancestors(id: str, tree: bool = False) -> None:
 
     request_url = f"http://localhost:3000/ancestor_nodes?descendant_node_id=eq.{id}"
     requested_data = request_data(request_url)
-    print_lineage(requested_data, id, "ancestor", tree)
+    print_lineage(requested_data, id, "ancestor", tree, all)

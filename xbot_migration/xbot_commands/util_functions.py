@@ -236,8 +236,18 @@ def search_by_type(target_item, argument):
     return response_data
 
 
+def fetch_descendants(id):
+    request_url = f"http://localhost:3000/ancestor_nodes?root_node_id=eq.{id}"
+    requested_data = request_data(request_url)
+    return requested_data
+
+
 def print_lineage(
-    response_data: list, id: str, target_lineage: str, tree: bool = False
+    response_data: list,
+    id: str,
+    target_lineage: str,
+    tree: bool = False,
+    all: bool = False,
 ) -> None:
     """Prints the lineage, i.e. ancestors or descendants, of an item.
 
@@ -254,6 +264,24 @@ def print_lineage(
         )
         for item in response_data:
             tree.add(f'{item[f"{target_lineage}_node_name"]}')
+        print(tree)
+    elif tree and all:
+        tree = Tree(
+            f"[bold cyan]{target_lineage.upper()} TREE[/bold cyan] - {node_name}",
+        )
+        for item in response_data:
+            descendants = fetch_descendants(item[f"{target_lineage}_node_id"])
+            baz_tree = tree.add(
+                f"[bold blue]{item[f'{target_lineage}_node_name']}[/bold blue]"
+            )
+            for descendant in descendants:
+                if (
+                    descendant[f"{target_lineage}_node_name"]
+                    == item[f"{target_lineage}_node_name"]
+                ):
+                    pass
+                else:
+                    baz_tree.add(f'{descendant[f"{target_lineage}_node_name"]}')
         print(tree)
     else:
         table = Table(title=f"\{target_lineage} of {node_name} node \n")
