@@ -305,7 +305,7 @@ def fetch_lineage(id: str) -> list:
 
 
 def print_lineage(
-    response_data: list,
+    response: object,
     id: str,
     target_lineage: str,
     tree: bool = False,
@@ -320,37 +320,44 @@ def print_lineage(
         tree (bool): whether to print the lineage as a tree.
         json (bool): whether to print the lineage in JSON mode.
     """
-    node = search_by_id(target_item="node", argument=id)
-    node_name = node[0]["name"]
-    output_format = retrieve_output_format()
-    if tree:
-        tree_items = [node_name]
-        tree = Tree(
-            f"\n[bold cyan]{target_lineage.upper()} TREE: {node_name.upper()}[/bold cyan]"
-        )
-        for item in response_data:
-            item_name = item[f"{target_lineage}_node_name"]
-            if item_name not in tree_items:
-                tree.add(item_name)
-                tree_items.append(item_name)
-        print(tree)
-    elif output_format == "json" or json:
-        console.print_json(data=response_data)
+    if response.status_code == 200:
+        response_data = response.json()
+        output_format = retrieve_output_format()
+        node = search_by_id(target_item="node", argument=id)
+        # Note: it is necessary to convert the node data to json before extracting the name.
+        node_name = node.json()[0]["name"]
+        if output_format == "json" or json:
+            console.print_json(data=response_data)
+        elif tree:
+            tree_items = [node_name]
+            tree = Tree(
+                f"\n[bold cyan]{target_lineage.upper()} TREE: {node_name.upper()}[/bold cyan]"
+            )
+            for item in response_data:
+                item_name = item[f"{target_lineage}_node_name"]
+                if item_name not in tree_items:
+                    tree.add(item_name)
+                    tree_items.append(item_name)
+            print(tree)
+        else:
+            table = Table(title=f"{target_lineage.upper()}S: {node_name.upper()} \n")
+            table.add_column("Name", justify="left", style="cyan", no_wrap=True)
+            table.add_column("Category", justify="left", style="blue", no_wrap=False)
+            table.add_column("ID", justify="left", style="magenta", no_wrap=False)
+            table_items = [node_name]
+            n = 0
+            for item in response_data:
+                item_name = item[f"{target_lineage}_node_name"]
+                if item_name not in table_items:
+                    n += 1
+                    table.add_row(
+                        f'{n}: {item[f"{target_lineage}_node_name"]}',
+                        f'{item[f"{target_lineage}_node_category"]}',
+                        f'{item[f"{target_lineage}_node_id"]}',
+                    )
+                    table_items.append(item_name)
+            console.print(table)
     else:
-        table = Table(title=f"{target_lineage.upper()}S: {node_name.upper()} \n")
-        table.add_column("Name", justify="left", style="cyan", no_wrap=True)
-        table.add_column("Category", justify="left", style="blue", no_wrap=False)
-        table.add_column("ID", justify="left", style="magenta", no_wrap=False)
-        table_items = [node_name]
-        n = 0
-        for item in response_data:
-            item_name = item[f"{target_lineage}_node_name"]
-            if item_name not in table_items:
-                n += 1
-                table.add_row(
-                    f'{n}: {item[f"{target_lineage}_node_name"]}',
-                    f'{item[f"{target_lineage}_node_category"]}',
-                    f'{item[f"{target_lineage}_node_id"]}',
-                )
-                table_items.append(item_name)
-        console.print(table)
+        console.print(
+            "It looks like your access token has expired. Please run [bold cyan]xbot config -e <your_email> -p <your_password> [/bold cyan] to generate a new one."
+        )
