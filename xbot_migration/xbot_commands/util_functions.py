@@ -3,7 +3,7 @@ import json
 import logging
 import os
 
-from typing import ItemsView
+from stat import S_IREAD
 
 import click
 import pytz
@@ -61,6 +61,21 @@ def retrieve_access_token() -> str:
     return access_token
 
 
+def store_access_token(email: str, password: str) -> None:
+    """Store access token used to access API.
+
+    Args:
+        email (str): email used to generate access token.
+        password (str[): password used to generate access token.
+    """
+    access_token = generate_access_token(email, password)
+    data = {"access_token": access_token}
+    with open("config.json", "w") as outfile:
+        json.dump(data, outfile)
+    filename = "config.json"
+    os.chmod(filename, S_IREAD)
+
+
 def request_data(base_url: str) -> object:
     """Requests data from the API.
 
@@ -70,14 +85,20 @@ def request_data(base_url: str) -> object:
     Returns:
         object: JSON object containing the data requested based on the base_url.
     """
-    access_token = generate_access_token()
-    request_url = f"{base_url}"
-    headers = CaseInsensitiveDict()
-    headers["Accept"] = "application/json"
-    headers["Authorization"] = f"Bearer {access_token}"
-    response = requests.get(request_url, headers=headers)
-    response_data = json.loads(response.text)
-    return response_data
+    try:
+        access_token = retrieve_access_token()
+        request_url = f"{base_url}"
+        headers = CaseInsensitiveDict()
+        headers["Accept"] = "application/json"
+        headers["Authorization"] = f"Bearer {access_token}"
+        response = requests.get(request_url, headers=headers)
+        response_data = json.loads(response.text)
+        return response_data
+    except Exception as e:
+        logger.error(e)
+        console.print(
+            "Hmm, something went wrong and we couldn't retrieve the data. Please run [bold red]xbot config[/bold red] to make sure you have the required permissions."
+        )
 
 
 def print_search(response_data: dict, verbose: bool = False) -> None:

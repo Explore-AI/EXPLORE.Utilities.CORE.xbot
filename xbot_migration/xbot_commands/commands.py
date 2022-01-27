@@ -1,8 +1,7 @@
 import json
 import logging
+import os
 import sys
-
-from os import access
 
 import click
 import requests
@@ -24,14 +23,15 @@ from xbot_commands.util_functions import (
     search_by_id,
     search_by_name,
     search_by_type,
+    store_access_token,
 )
 
 FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
 
-ITEM_STATES = ["provisioned", "started", "active", "error", "stopped", "suspended"]
 CLOUD_PROVIDERS = ["aws", "azure", "gcp"]
 ITEM_TYPES = ["operational", "enrichment"]
+ITEM_STATES = ["provisioned", "started", "active", "error", "stopped", "suspended"]
 
 logger = logging.getLogger()
 console = Console(record=True)
@@ -47,10 +47,12 @@ def config(email: str, password: str) -> None:
         email (str): user email
         password (str): user password
     """
-    access_token = generate_access_token(email, password)
-    data = {"access_token": access_token}
-    with open("config.json", "w") as outfile:
-        json.dump(data, outfile)
+    if email and password:
+        store_access_token(email, password)
+    else:
+        email = input("Email: ")
+        password = input("Password: ")
+        store_access_token(email, password)
 
 
 @click.command()
