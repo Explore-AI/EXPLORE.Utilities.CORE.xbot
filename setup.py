@@ -12,7 +12,7 @@ def read_requirements(fpath=REQUIREMENTS_FILE):
 
 
 setup(
-    name="xbot-cli",
+    name="xbot",
     version="0.1",
     packages=find_packages(),
     include_package_data=True,
