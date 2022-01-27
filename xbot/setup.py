@@ -1,14 +1,25 @@
-from setuptools import setup, find_packages
+from importlib.metadata import entry_points
+
+from setuptools import find_packages, setup
+
+REQUIREMENTS_FILE = "requirements.txt"
+
+
+def read_requirements(fpath=REQUIREMENTS_FILE):
+    with open(fpath) as f:
+        requirements = f.readlines()
+    return requirements
+
 
 setup(
-    name='xbot-cli',
-    version='0.1',
-    packages=find_packages(exclude=['tests*']),
-    license='MIT',
-    description='xbot - The EXPLORE Command Line Interface tool for interacting with your data mesh platform',
-    long_description=open('README.md').read(),
-    install_requires=['requests','argparse','datetime','pytz'],
-    url='https://github.com/Explore-AI/EXPLORE.Utilities.CORE.xbot',
-    author='EXPLORE-AI CORE Developers',
-    author_email='keagan@explore-ai.net'
+    name="xbot-cli",
+    version="0.1",
+    packages=find_packages(),
+    include_package_data=True,
+    install_requires=read_requirements(),
+    entry_points={
+        "console_scripts": [
+            "xbot = xbot:xbot",
+        ],
+    },
 )
