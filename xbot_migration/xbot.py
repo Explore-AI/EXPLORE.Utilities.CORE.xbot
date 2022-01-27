@@ -26,7 +26,11 @@ logger = logging.getLogger()
     help="The desired log level",
 )
 def xbot(log_level: str) -> None:
-    logging.basicConfig(format=FORMATTER, level=getattr(logging, log_level.upper()))
+    logging.basicConfig(
+        format=FORMATTER,
+        level=getattr(logging, log_level.upper()),
+        filename="xbot_log.log",
+    )
     logger.debug(f"Log level: {log_level.upper()}")
 
 

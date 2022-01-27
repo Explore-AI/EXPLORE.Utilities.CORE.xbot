@@ -29,6 +29,7 @@ from xbot_commands.util_functions import (
 FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
 
+
 CLOUD_PROVIDERS = ["aws", "azure", "gcp"]
 ITEM_TYPES = ["operational", "enrichment"]
 ITEM_STATES = ["provisioned", "started", "active", "error", "stopped", "suspended"]
@@ -50,10 +51,14 @@ def config(email: str, password: str, json: bool) -> None:
     """
     if email and password:
         store_access_token(email, password, json)
+        access_token = retrieve_access_token()
+        logger.info(f"Storage of access token: {access_token}")
     else:
         email = click.prompt("Email: ", type=str)
         password = click.prompt("Password: ", type=str)
         store_access_token(email, password, json)
+        access_token = retrieve_access_token()
+        logger.info(f"Storage of access token: {access_token}")
 
 
 @click.command()
@@ -165,6 +170,8 @@ def create(ctx: object, name: str, domain: str, cloud: str) -> None:
     if response_data.status_code == 201:
         console.print("[bold green]Node successfully created[/bold green]\n")
         search_by_name(target_item, name)
+        access_token = retrieve_access_token()
+        logger.info(f"Node created by user with token {access_token}. Node ID: {name}")
     else:
         console.print(
             f"There was an error creating your node. [bold red] Details:[/bold red] Status code - {response_data.status_code}. Message - {response_data.json()['message']}"

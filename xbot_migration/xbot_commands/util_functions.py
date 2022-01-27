@@ -42,8 +42,9 @@ def generate_access_token(email: str, password: str) -> str:
             return token
         else:
             click.echo(
-                "The details entered are incorrect, do you have the required .env file?"
+                "The details entered are incorrect, please run [bold red]xbot config -e <your_email> -p <your_password>[/bold red] or contact your account owner for the required permissions."
             )
+            logger.info(f"Failed attempt to generate access token for {email}")
             exit()
     except Exception as e:
         click.echo(e)
