@@ -166,8 +166,8 @@ def create(ctx: object, name: str, domain: str, cloud: str) -> None:
         console.print("[bold green]Node successfully created[/bold green]\n")
         search_by_name(target_item, name)
     else:
-        print(
-            f"There was an error creating your node. Status code: {response_data.status_code}. Error message:{response_data.json()['message']}"
+        console.print(
+            f"There was an error creating your node. [bold red] Details:[/bold red] Status code - {response_data.status_code}. Message - {response_data.json()['message']}"
         )
 
 

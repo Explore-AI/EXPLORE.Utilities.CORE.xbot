@@ -108,8 +108,7 @@ def request_data(base_url: str) -> list:
         headers["Accept"] = "application/json"
         headers["Authorization"] = f"Bearer {access_token}"
         response = requests.get(request_url, headers=headers)
-        response_data = json.loads(response.text)
-        return response_data
+        return response
     except Exception as e:
         logger.error(e)
         console.print(
@@ -117,35 +116,42 @@ def request_data(base_url: str) -> list:
         )
 
 
-def print_search(response_data: dict, json: bool = False) -> None:
+def print_search(response: dict, json: bool = False) -> None:
     """Prints the data requested from the API.
 
     Args:
         response_data (object): JSON object containing the data requested based on the base_url.
         json (bool): whether to print the data in JSON format. Defaults to False.
     """
-    output_format = retrieve_output_format()
-    if output_format == "json" or json:
-        console.print_json(data=response_data)
-    else:
-        table = Table(title="Results")
-        table.add_column("Name", justify="left", style="cyan", no_wrap=True)
-        table.add_column("State", justify="left", style="magenta", no_wrap=True)
-        table.add_column("Age (days)", justify="left", style="green", no_wrap=True)
-        table.add_column("ID", justify="left", style="blue", no_wrap=False)
-        n = 0
-        for item in response_data:
-            age = get_item_age(item)
-            n += 1
-            table.add_row(
-                f'{n}. {item["name"]}',
-                f'{item["node_state"]}',
-                f"{age}",
-                f'{item["id"]}',
+
+    if response.status_code == 200:
+        response_data = response.json()
+        output_format = retrieve_output_format()
+        if output_format == "json" or json:
+            console.print_json(data=response_data)
+        else:
+            table = Table(title="Results")
+            table.add_column("Name", justify="left", style="cyan", no_wrap=True)
+            table.add_column("State", justify="left", style="magenta", no_wrap=True)
+            table.add_column("Age (days)", justify="left", style="green", no_wrap=True)
+            table.add_column("ID", justify="left", style="blue", no_wrap=False)
+            n = 0
+            for item in response_data:
+                age = get_item_age(item)
+                n += 1
+                table.add_row(
+                    f'{n}. {item["name"]}',
+                    f'{item["node_state"]}',
+                    f"{age}",
+                    f'{item["id"]}',
+                )
+            console.print(table)
+            console.print(
+                f"\nHint: To view output in JSON format, append [bold cyan]--json[/bold cyan] or [bold cyan]-j[/bold cyan] to the previous command.\n"
             )
-        console.print(table)
+    else:
         console.print(
-            f"\nHint: To view output in JSON format, append [bold cyan]--json[/bold cyan] or [bold cyan]-j[/bold cyan] to the previous command.\n"
+            "It looks like your access token has expired. Please run [bold cyan]xbot config -e <your_email> -p <your_password> [/bold cyan] to generate a new one."
         )
 
 
@@ -320,7 +326,7 @@ def print_lineage(
     if tree:
         tree_items = [node_name]
         tree = Tree(
-            f"[bold cyan]{target_lineage.upper()} TREE: {node_name.upper()}[/bold cyan]"
+            f"\n[bold cyan]{target_lineage.upper()} TREE: {node_name.upper()}[/bold cyan]"
         )
         for item in response_data:
             item_name = item[f"{target_lineage}_node_name"]
