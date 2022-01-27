@@ -50,8 +50,8 @@ def config(email: str, password: str) -> None:
     if email and password:
         store_access_token(email, password)
     else:
-        email = input("Email: ")
-        password = input("Password: ")
+        email = click.prompt("Email: ", type=str)
+        password = click.prompt("Password: ", type=str)
         store_access_token(email, password)
 
 

@@ -3,7 +3,7 @@ import json
 import logging
 import os
 
-from stat import S_IREAD
+from stat import S_IREAD, S_IWUSR
 
 import click
 import pytz
@@ -70,10 +70,10 @@ def store_access_token(email: str, password: str) -> None:
     """
     access_token = generate_access_token(email, password)
     data = {"access_token": access_token}
-    with open("config.json", "w") as outfile:
-        json.dump(data, outfile)
     filename = "config.json"
-    os.chmod(filename, S_IREAD)
+    os.chmod(filename, S_IWUSR | S_IREAD)
+    with open(filename, "w") as outfile:
+        json.dump(data, outfile)
 
 
 def request_data(base_url: str) -> object:
