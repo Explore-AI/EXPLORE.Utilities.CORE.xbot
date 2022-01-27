@@ -24,6 +24,7 @@ console = Console()
 FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
 
+
 logger = logging.getLogger()
 
 
@@ -61,7 +62,19 @@ def retrieve_access_token() -> str:
     return access_token
 
 
-def store_access_token(email: str, password: str) -> None:
+def retrieve_output_format() -> str:
+    """Retrieves the output format from the config file.
+
+    Returns:
+        str: the output format.
+    """
+    with open("config.json", "r") as openfile:
+        json_object = json.load(openfile)
+        output_format = json_object["output_format"]
+    return output_format
+
+
+def store_access_token(email: str, password: str, json_format: bool) -> None:
     """Store access token used to access API.
 
     Args:
@@ -69,21 +82,24 @@ def store_access_token(email: str, password: str) -> None:
         password (str[): password used to generate access token.
     """
     access_token = generate_access_token(email, password)
-    data = {"access_token": access_token}
+    if json_format:
+        data = {"access_token": access_token, "output_format": "json"}
+    else:
+        data = {"access_token": access_token, "output_format": "default"}
     filename = "config.json"
     os.chmod(filename, S_IWUSR | S_IREAD)
     with open(filename, "w") as outfile:
         json.dump(data, outfile)
 
 
-def request_data(base_url: str) -> object:
+def request_data(base_url: str) -> list:
     """Requests data from the API.
 
     Args:
         base_url (str): the URL and query paramaters to be used in the request.
 
     Returns:
-        object: JSON object containing the data requested based on the base_url.
+        list: JSON object containing the data requested based on the base_url.
     """
     try:
         access_token = retrieve_access_token()
@@ -108,7 +124,8 @@ def print_search(response_data: dict, verbose: bool = False) -> None:
         response_data (object): JSON object containing the data requested based on the base_url.
         verbose (bool): whether to print the data in JSON format. Defaults to False.
     """
-    if verbose:
+    output_format = retrieve_output_format()
+    if output_format == "json" or verbose:
         console.print_json(data=response_data)
     else:
         table = Table(title="Results")
@@ -286,7 +303,7 @@ def print_lineage(
     id: str,
     target_lineage: str,
     tree: bool = False,
-    all: bool = False,
+    verbose: bool = False,
 ) -> None:
     """Prints the lineage, i.e. ancestors or descendants, of an item.
 
@@ -294,9 +311,12 @@ def print_lineage(
         response_data (list): a list of items matching the search criteria.
         id (str): ID of the item you want to print the lineage for.
         target_lineage (str): ancestor or descendant.
+        tree (bool): whether to print the lineage as a tree.
+        verbose (bool): whether to print the lineage in JSON mode.
     """
     node = search_by_id(target_item="node", argument=id)
     node_name = node[0]["name"]
+    output_format = retrieve_output_format()
     if tree:
         tree_items = [node_name]
         tree = Tree(
@@ -308,8 +328,10 @@ def print_lineage(
                 tree.add(item_name)
                 tree_items.append(item_name)
         print(tree)
+    elif output_format == "json" or verbose:
+        console.print_json(data=response_data)
     else:
-        table = Table(title=f"\{target_lineage} of {node_name} node \n")
+        table = Table(title=f"{target_lineage.upper()}S: {node_name.upper()} \n")
         table.add_column("Name", justify="left", style="cyan", no_wrap=True)
         table.add_column("Category", justify="left", style="blue", no_wrap=False)
         table.add_column("ID", justify="left", style="magenta", no_wrap=False)

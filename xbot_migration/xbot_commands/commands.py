@@ -40,7 +40,8 @@ console = Console(record=True)
 @click.command()
 @click.option("--email", "-e", help="Username")
 @click.option("--password", "-p", help="Password")
-def config(email: str, password: str) -> None:
+@click.option("--json", is_flag=True, help="Default to output in JSON format")
+def config(email: str, password: str, json: bool) -> None:
     """Stores access token and global settings of the user.
 
     Args:
@@ -48,11 +49,11 @@ def config(email: str, password: str) -> None:
         password (str): user password
     """
     if email and password:
-        store_access_token(email, password)
+        store_access_token(email, password, json)
     else:
         email = click.prompt("Email: ", type=str)
         password = click.prompt("Password: ", type=str)
-        store_access_token(email, password)
+        store_access_token(email, password, json)
 
 
 @click.command()
@@ -175,7 +176,8 @@ def create(ctx: object, name: str, domain: str, cloud: str) -> None:
 @click.command()
 @click.argument("id", type=str)
 @click.option("--tree", is_flag=True, help="print as ancestor tree")
-def descendants(id: str, tree: bool = False) -> None:
+@click.option("--verbose", "-v", is_flag=True, help="print output in JSON format.")
+def descendants(id: str, tree: bool = False, verbose: bool = False) -> None:
     """View the descendants of a node.
 
     Args:
@@ -184,13 +186,14 @@ def descendants(id: str, tree: bool = False) -> None:
         Example: `xbot node descendants {node_id}`. Hint: If you're uncertain of the ID of a node, use the `xbot node ls` command to find it.
     """
     requested_data = fetch_lineage(id)
-    print_lineage(requested_data, id, "descendant", tree)
+    print_lineage(requested_data, id, "descendant", tree, verbose)
 
 
 @click.command()
 @click.argument("id", type=str)
 @click.option("--tree", is_flag=True, help="print as ancestor tree")
-def ancestors(id: str, tree: bool = False) -> None:
+@click.option("--verbose", "-v", is_flag=True, help="print output in JSON format.")
+def ancestors(id: str, tree: bool = False, verbose: bool = False) -> None:
     """View the ancestors of a node.
 
     Args:
@@ -200,4 +203,4 @@ def ancestors(id: str, tree: bool = False) -> None:
     """
 
     requested_data = fetch_lineage(id)
-    print_lineage(requested_data, id, "ancestor", tree)
+    print_lineage(requested_data, id, "ancestor", tree, verbose=verbose)
