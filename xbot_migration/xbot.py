@@ -2,7 +2,15 @@ import logging
 
 import click
 
-from xbot_commands.commands import ancestors, create, descendants, ls, search, total
+from xbot_commands.commands import (
+    ancestors,
+    config,
+    create,
+    descendants,
+    ls,
+    search,
+    total,
+)
 
 FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
@@ -39,6 +47,8 @@ def interface() -> None:
     """Inspect interfaces running in the mesh."""
     pass
 
+
+xbot.add_command(config)
 
 node.add_command(ls)
 node.add_command(total)

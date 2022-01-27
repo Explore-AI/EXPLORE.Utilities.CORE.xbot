@@ -1,5 +1,8 @@
+import json
 import logging
 import sys
+
+from os import access
 
 import click
 import requests
@@ -10,13 +13,14 @@ from rich.console import Console
 
 from xbot_commands.util_functions import (
     fetch_lineage,
-    get_access_token,
+    generate_access_token,
     list_by_item_age,
     list_by_item_state,
     list_by_state_and_age,
     print_lineage,
     print_search,
     request_data,
+    retrieve_access_token,
     search_by_id,
     search_by_name,
     search_by_type,
@@ -31,6 +35,22 @@ ITEM_TYPES = ["operational", "enrichment"]
 
 logger = logging.getLogger()
 console = Console(record=True)
+
+
+@click.command()
+@click.option("--email", "-e", help="Username")
+@click.option("--password", "-p", help="Password")
+def config(email: str, password: str) -> None:
+    """Stores access token and global settings of the user.
+
+    Args:
+        email (str): user email
+        password (str): user password
+    """
+    access_token = generate_access_token(email, password)
+    data = {"access_token": access_token}
+    with open("config.json", "w") as outfile:
+        json.dump(data, outfile)
 
 
 @click.command()
@@ -126,7 +146,7 @@ def total() -> None:
 @click.pass_context
 def create(ctx: object, name: str, domain: str, cloud: str) -> None:
     """This command creates a new item in the mesh. Example: `xbot node create --name "my_node" --domain "waste.water" --cloud aws` will create a new node."""
-    access_token = get_access_token()
+    access_token = generate_access_token()
     target_item = sys.argv[1]
     base_url = f"http://localhost:3000/{target_item}s"
     headers = CaseInsensitiveDict()

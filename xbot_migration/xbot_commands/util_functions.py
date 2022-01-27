@@ -27,19 +27,15 @@ VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
 logger = logging.getLogger()
 
 
-def get_access_token() -> str:
+def generate_access_token(email: str, password: str) -> str:
     """Generates an access token required to make requests to the API.
 
     Returns:
         str: JWT access token that is used in the headers of all requests.
     """
     try:
-        user_email = os.getenv("user_email")
-        user_password = os.getenv("user_password")
         url = "http://localhost:3000/rpc/login"
-        response = requests.post(
-            url, json={"email": user_email, "password": user_password}
-        )
+        response = requests.post(url, json={"email": email, "password": password})
         if response.status_code == 200:
             token = response.json()["token"]
             return token
@@ -53,6 +49,18 @@ def get_access_token() -> str:
         exit()
 
 
+def retrieve_access_token() -> str:
+    """Retrieve access token used to access API.
+
+    Returns:
+        str: access token used to access API.
+    """
+    with open("config.json", "r") as openfile:
+        json_object = json.load(openfile)
+        access_token = json_object["access_token"]
+    return access_token
+
+
 def request_data(base_url: str) -> object:
     """Requests data from the API.
 
@@ -62,7 +70,7 @@ def request_data(base_url: str) -> object:
     Returns:
         object: JSON object containing the data requested based on the base_url.
     """
-    access_token = get_access_token()
+    access_token = generate_access_token()
     request_url = f"{base_url}"
     headers = CaseInsensitiveDict()
     headers["Accept"] = "application/json"
