@@ -117,15 +117,15 @@ def request_data(base_url: str) -> list:
         )
 
 
-def print_search(response_data: dict, verbose: bool = False) -> None:
+def print_search(response_data: dict, json: bool = False) -> None:
     """Prints the data requested from the API.
 
     Args:
         response_data (object): JSON object containing the data requested based on the base_url.
-        verbose (bool): whether to print the data in JSON format. Defaults to False.
+        json (bool): whether to print the data in JSON format. Defaults to False.
     """
     output_format = retrieve_output_format()
-    if output_format == "json" or verbose:
+    if output_format == "json" or json:
         console.print_json(data=response_data)
     else:
         table = Table(title="Results")
@@ -145,7 +145,7 @@ def print_search(response_data: dict, verbose: bool = False) -> None:
             )
         console.print(table)
         console.print(
-            f"\nHint: To view more verbose information, append the [bold cyan]-v[/bold cyan] flag to the previous command.\n"
+            f"\nHint: To view output in JSON format, append [bold cyan]--json[/bold cyan] or [bold cyan]-j[/bold cyan] to the previous command.\n"
         )
 
 
@@ -174,7 +174,7 @@ def list_by_state_and_age(
     state: str = "active",
     count: int = 5,
     target_item: str = "node",
-    verbose: bool = False,
+    json: bool = False,
 ):
     """List items based on their state AND age.
 
@@ -189,7 +189,7 @@ def list_by_state_and_age(
     request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}&{target_item}_state=eq.{state}"
     response_data = request_data(request_url)
     if response_data:
-        print_search(response_data[:count], verbose)
+        print_search(response_data[:count], json)
     else:
         logger.info(
             f"No {target_item}s of state '{state}' provisioned within the last {age} days. Please refine your search."
@@ -197,7 +197,7 @@ def list_by_state_and_age(
 
 
 def list_by_item_state(
-    state: str, count: int = 5, target_item: str = "node", verbose: bool = False
+    state: str, count: int = 5, target_item: str = "node", json: bool = False
 ):
     """List items based on their state.
 
@@ -210,13 +210,13 @@ def list_by_item_state(
     request_url = f"{base_url}?select=*&{target_item}_state=eq.{state}"
     response_data = request_data(request_url)
     if response_data:
-        print_search(response_data[:count], verbose)
+        print_search(response_data[:count], json)
     else:
         logger.info(f"No {target_item}s with state '{state}' found.")
 
 
 def list_by_item_age(
-    age: int, count: int, target_item: str = "node", verbose: bool = False
+    age: int, count: int, target_item: str = "node", json: bool = False
 ):
     """List items based on their age.
 
@@ -231,7 +231,7 @@ def list_by_item_age(
     request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}"
     response_data = request_data(request_url)
     if response_data:
-        print_search(response_data[:count], verbose)
+        print_search(response_data[:count], json)
     else:
         logger.info(f"No {target_item}s provisioned within the last {age} days.")
 
@@ -303,7 +303,7 @@ def print_lineage(
     id: str,
     target_lineage: str,
     tree: bool = False,
-    verbose: bool = False,
+    json: bool = False,
 ) -> None:
     """Prints the lineage, i.e. ancestors or descendants, of an item.
 
@@ -312,7 +312,7 @@ def print_lineage(
         id (str): ID of the item you want to print the lineage for.
         target_lineage (str): ancestor or descendant.
         tree (bool): whether to print the lineage as a tree.
-        verbose (bool): whether to print the lineage in JSON mode.
+        json (bool): whether to print the lineage in JSON mode.
     """
     node = search_by_id(target_item="node", argument=id)
     node_name = node[0]["name"]
@@ -328,7 +328,7 @@ def print_lineage(
                 tree.add(item_name)
                 tree_items.append(item_name)
         print(tree)
-    elif output_format == "json" or verbose:
+    elif output_format == "json" or json:
         console.print_json(data=response_data)
     else:
         table = Table(title=f"{target_lineage.upper()}S: {node_name.upper()} \n")
