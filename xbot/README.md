@@ -5,14 +5,14 @@ The Command Line Interface for creating and interacting with a running Mesh inst
 `python setup.py sdist`
 
 ## Installing this package from GitHub
-`pip install -e "git+https://github.com/Explore-AI/EXPLORE.Utilities.CORE.xbot#egg=xbot"`
+`pip install -e "git+https://github.com/Explore-AI/EXPLORE.Utilities.CORE.xbot#egg=xbot_cli"`
 
 Install the required dependencies: `pip install -r requirements.txt`
 # How to use this package
 
 The command above will create a `src` folder and install the `xbot-cli` package in it. Navigate through these folders to the `xbot` folder (`cd src/xbot-cli/xbot`) and run `python xbot.py -h` to see a list of commands.
 
-The following commands are available on the command line interface, with their usage explained below. You can view all possible commands and the arguments they accept by running `python xbot.py -h`. 
+The following commands are available on the command line interface, with their usage explained below. You can view all possible commands and the arguments they accept by running `python xbot.py -h`.
 ## Querying the mesh
 
 ### Querying nodes:
@@ -30,10 +30,10 @@ The following commands are available on the command line interface, with their u
 - `python xbot.py -total_nodes`: displays the total number of nodes in your mesh. Example: `python xbot.py -total_nodes`
 
 ### Adding and deleting nodes:
-- `python xbot.py -an` or `python xbot.py -add_node`: allows you to add a new node to the mesh. Running the command will lead to a series of prompts to collect information about the node, which will then be used to create the node. No additional arguments are required.  
+- `python xbot.py -an` or `python xbot.py -add_node`: allows you to add a new node to the mesh. Running the command will lead to a series of prompts to collect information about the node, which will then be used to create the node. No additional arguments are required.
 - `python xbot.py -delete_node`: allows you to delete a node by providing the node ID. Example: `python xbot.py -delete_node 43584d4d8d6ee7f879f6ca9e38e164d21b19576ddfd0231dfe9354caddc9b471`
 ---
-### Querying ports: 
+### Querying ports:
 
 - `python xbot.py -all_ports`: displays all ports, their port number, and state, currently in your mesh.
 - `python xbot.py -ps` or `python xbot.py -port_state`: allows you to query ports based on their state i.e. open or closed. Example: `python xbot.py -ps open`
@@ -41,14 +41,14 @@ The following commands are available on the command line interface, with their u
 - `python xbot.py -total_ports`: displays the total number of nodes in your mesh. Example: `python xbot.py -total_ports`
 
 ### Adding and deleting ports:
-- `python xbot.py -ap` or `python xbot.py -add_port`: allows you to add a new port to the mesh. Running the command will display the nodes that currently exist in the mesh and will ask you to select and input the ID of the node that you wish to add the port to, before asking for additional information. 
-- `python xbot.py -delete_port`: allows you to delete a port by providing the port number and the node ID of the node where the port can be found. Example: `python xbot.py -delete_port 3000 43584d4d8d6ee7f879f6ca9e38e164d21b19576ddfd0231dfe9354caddc9b471` will delete port 3000 on the node with the given ID. It's necessary to supply both the port number and the node ID because a port with the same number can exist on multiple nodes. 
+- `python xbot.py -ap` or `python xbot.py -add_port`: allows you to add a new port to the mesh. Running the command will display the nodes that currently exist in the mesh and will ask you to select and input the ID of the node that you wish to add the port to, before asking for additional information.
+- `python xbot.py -delete_port`: allows you to delete a port by providing the port number and the node ID of the node where the port can be found. Example: `python xbot.py -delete_port 3000 43584d4d8d6ee7f879f6ca9e38e164d21b19576ddfd0231dfe9354caddc9b471` will delete port 3000 on the node with the given ID. It's necessary to supply both the port number and the node ID because a port with the same number can exist on multiple nodes.
 ---
 ### Querying interfaces:
 - `python xbot.py -i` or `python xbot.py -interface`: allows you to retrieve the interface for a specific node by proving a node ID. Example: `python xbot.py -interface 43584d4d8d6ee7f879f6ca9e38e164d21b19576ddfd0231dfe9354caddc9b471`
 
 # Request for feedback
 
-This CLI is still in development and any feedback and comments would be appreciated. When testing, please think about how to make the user experience simpler and more intuitive. If there are parts of it that feel like they're surfacing too much information, or too little information, please let us know. 
+This CLI is still in development and any feedback and comments would be appreciated. When testing, please think about how to make the user experience simpler and more intuitive. If there are parts of it that feel like they're surfacing too much information, or too little information, please let us know.
 
 You can note all feedback and comments on [this Notion page](https://www.notion.so/exploreutils/xbot-Feedback-707fffa4a706419bb165606940619b0c), or email core-platform@explore-utilities.com.
