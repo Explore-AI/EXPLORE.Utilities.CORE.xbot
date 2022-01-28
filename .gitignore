@@ -3,6 +3,7 @@ diary.md
 xbot.egg-info
 xbot/__pycache__
 decision-log.md
+config.json
 
 # macos files
 .DS_Store
