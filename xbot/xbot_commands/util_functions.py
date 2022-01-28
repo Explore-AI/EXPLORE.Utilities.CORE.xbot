@@ -119,7 +119,7 @@ def request_data(base_url: str) -> list:
     except Exception as e:
         logger.error(e)
         console.print(
-            "Hmm, something went wrong and we couldn't retrieve the data. Please run [bold red]xbot config[/bold red] to make sure you have the required permissions."
+            "Hmm, something went wrong. Please run [bold green]`xbot config`[/bold green] to make sure you have the required permissions."
         )
 
 

@@ -82,20 +82,23 @@ def ls(ctx, all: str, state: str, age: int, count: int = 5, json: bool = False) 
     target_item = sys.argv[1]
     base_url = f"http://localhost:3000/{target_item}s"
     response_data = request_data(base_url)
-    if state and age:
-        list_by_state_and_age(age, state, count, target_item, json)
-    elif state:
-        list_by_item_state(state, count, target_item, json)
-    elif age:
-        list_by_item_age(age, count, target_item, json)
-    elif count:
-        print_search(response_data[:count], json)
-    elif all:
-        print_search(response_data, json)
+    if response_data is not None:
+        if state and age:
+            list_by_state_and_age(age, state, count, target_item, json)
+        elif state:
+            list_by_item_state(state, count, target_item, json)
+        elif age:
+            list_by_item_age(age, count, target_item, json)
+        elif count:
+            print_search(response_data[:count], json)
+        elif all:
+            print_search(response_data, json)
+        else:
+            console.print(
+                f"Hmm, I'm not sure what you want me to do. Try [bold green]`xbot {target_item} ls --all`[/bold green] to view all {target_item}s, or [bold green]`xbot {target_item} ls --help`[/bold green] for more options."
+            )
     else:
-        console.print(
-            f"Hmm, I'm not sure what you want me to do. Try [bold green]`xbot {target_item} ls --all`[/bold green] to view all {target_item}s, or [bold green]`xbot {target_item} ls --help`[/bold green] for more options."
-        )
+        exit()
 
 
 @click.command()
