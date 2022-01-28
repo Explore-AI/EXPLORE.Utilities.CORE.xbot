@@ -54,8 +54,8 @@ def config(email: str, password: str, json: bool) -> None:
         access_token = retrieve_access_token()
         logger.info(f"Storage of access token: {access_token}")
     else:
-        email = click.prompt("Email: ", type=str)
-        password = click.prompt("Password: ", type=str)
+        email = click.prompt("Email", type=str)
+        password = click.prompt("Password", type=str)
         store_access_token(email, password, json)
         access_token = retrieve_access_token()
         logger.info(f"Storage of access token: {access_token}")

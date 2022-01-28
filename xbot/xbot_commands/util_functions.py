@@ -88,9 +88,15 @@ def store_access_token(email: str, password: str, json_format: bool) -> None:
     else:
         data = {"access_token": access_token, "output_format": "default"}
     filename = "config.json"
-    os.chmod(filename, S_IWUSR | S_IREAD)
-    with open(filename, "w") as outfile:
-        json.dump(data, outfile)
+    try:
+        os.chmod(filename, S_IWUSR | S_IREAD)
+        with open(filename, "w") as outfile:
+            json.dump(data, outfile)
+    except FileNotFoundError:
+        open(filename, "w")
+        os.chmod(filename, S_IWUSR | S_IREAD)
+        with open(filename, "w") as outfile:
+            json.dump(data, outfile)
 
 
 def request_data(base_url: str) -> list:
