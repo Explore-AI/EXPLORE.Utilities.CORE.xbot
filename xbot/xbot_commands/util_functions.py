@@ -99,7 +99,7 @@ def store_access_token(email: str, password: str, json_format: bool) -> None:
             json.dump(data, outfile)
 
 
-def request_data(base_url: str) -> list:
+def request_data(base_url: str) -> dict:
     """Requests data from the API.
 
     Args:
@@ -143,7 +143,7 @@ def print_search(target_item: str, response: dict, json: bool = False) -> None:
                 print_port_results(response_data)
     else:
         console.print(
-            "It looks like your access token has expired. Please run [bold cyan]xbot config -e <your_email> -p <your_password> [/bold cyan] to generate a new one."
+            "It looks like your access token is not configured. Please run [bold cyan]xbot config -e <your_email> -p <your_password> [/bold cyan] to generate a new one."
         )
 
 
@@ -224,7 +224,6 @@ def get_item_age(item: str) -> str:
 def list_by_state_and_age(
     age: int,
     state: str = "active",
-    count: int = 5,
     target_item: str = "node",
     json: bool = False,
 ):
@@ -233,49 +232,42 @@ def list_by_state_and_age(
     Args:
         age (int): number of days search criteria should apply to.
         state (string): ["provisioned", "started", "active", "error", "stopped", "suspended"]
-        count (int): number of items to be listed. Defaults to 5 items.
         target_item (str): the target item to be listed e.g. node, port or interface. Defaults to node.
     """
     from_datetime = datetime.datetime.now() - datetime.timedelta(age)
     base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}&{target_item}_state=eq.{state}"
-    response_data = request_data(request_url)
-    if response_data:
-        print_search(response_data[:count], json)
+    response = request_data(request_url)
+    if response:
+        print_search(target_item, response, json)
     else:
-        logger.info(
-            f"No {target_item}s of state '{state}' provisioned within the last {age} days. Please refine your search."
+        console.print(
+            "We're having some trouble authenticating your profile. Please run [bold cyan]xbot config -e <your_email> -p <your_password> [/bold cyan] to login."
         )
 
 
-def list_by_item_state(
-    state: str, count: int = 5, target_item: str = "node", json: bool = False
-):
+def list_by_item_state(state: str, target_item: str = "node", json: bool = False):
     """List items based on their state.
 
     Args:
         state (string): ["provisioned", "started", "active", "error", "stopped", "suspended"]
-        count (int): number of items to be listed. Defaults to 5 items.
         target_item (str): the target item to be listed e.g. node, port or interface. Defaults to node.
     """
     base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?select=*&{target_item}_state=eq.{state}"
     response_data = request_data(request_url)
     if response_data:
-        print_search(response_data[:count], json)
+        print_search(target_item, response_data, json)
     else:
         logger.info(f"No {target_item}s with state '{state}' found.")
 
 
-def list_by_item_age(
-    age: int, count: int, target_item: str = "node", json: bool = False
-):
+def list_by_item_age(age: int, target_item: str = "node", json: bool = False):
     """List items based on their age.
 
     Args:
         age (int): number of days search criteria should apply to.
         state (string): ["provisioned", "started", "active", "error", "stopped", "suspended"]
-        count (int): number of items to be listed. Defaults to 5 items.
         target_item (str): the target item to be listed e.g. node, port or interface. Defaults to node.
     """
     from_datetime = datetime.datetime.now() - datetime.timedelta(age)
@@ -283,7 +275,7 @@ def list_by_item_age(
     request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}"
     response_data = request_data(request_url)
     if response_data:
-        print_search(response_data[:count], json)
+        print_search(target_item, response_data, json)
     else:
         logger.info(f"No {target_item}s provisioned within the last {age} days.")
 

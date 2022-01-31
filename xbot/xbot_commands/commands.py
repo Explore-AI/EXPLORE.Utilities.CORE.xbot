@@ -63,19 +63,17 @@ def config(email: str, password: str, json: bool) -> None:
 
 @click.command()
 @click.option("--all", "-a", help="list all items", is_flag=True)
-@click.option("--count", help="number of items to be listed", type=int)
 @click.option("--state", help="list items by state", type=click.Choice(ITEM_STATES))
 @click.option(
     "--age", help="list items provisioned within a certain timeframe", type=int
 )
 @click.option("--json", "-j", is_flag=True, help="print more output.")
 @click.pass_context
-def ls(ctx, all: str, state: str, age: int, count: int = 5, json: bool = False) -> None:
+def ls(ctx, all: str, state: str, age: int, json: bool = False) -> None:
     """List items in the mesh. Example: `xbot node ls --5` will list the 5 most recent items.
 
     Args:
         age (int): number of days search criteria should apply to.
-        count (int): number of items to be listed. Defaults to 5 items.
         state (str): list items by state. Defaults to all states available.
         json (bool): whether to print the data in JSON format. Defaults to False.
     """
@@ -84,13 +82,11 @@ def ls(ctx, all: str, state: str, age: int, count: int = 5, json: bool = False) 
     response_data = request_data(base_url)
     if response_data is not None:
         if state and age:
-            list_by_state_and_age(age, state, count, target_item, json)
+            list_by_state_and_age(age, state, target_item, json)
         elif state:
-            list_by_item_state(state, count, target_item, json)
+            list_by_item_state(state, target_item, json)
         elif age:
-            list_by_item_age(age, count, target_item, json)
-        elif count:
-            print_search(target_item, response_data[:count], json)
+            list_by_item_age(age, target_item, json)
         elif all:
             print_search(target_item, response_data, json)
         else:
