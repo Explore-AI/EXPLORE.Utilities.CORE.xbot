@@ -90,9 +90,9 @@ def ls(ctx, all: str, state: str, age: int, count: int = 5, json: bool = False) 
         elif age:
             list_by_item_age(age, count, target_item, json)
         elif count:
-            print_search(response_data[:count], json)
+            print_search(target_item, response_data[:count], json)
         elif all:
-            print_search(response_data, json)
+            print_search(target_item, response_data, json)
         else:
             console.print(
                 f"Hmm, I'm not sure what you want me to do. Try [bold green]`xbot {target_item} ls --all`[/bold green] to view all {target_item}s, or [bold green]`xbot {target_item} ls --help`[/bold green] for more options."
@@ -123,13 +123,13 @@ def search(ctx: object, name: str, id: str, type: str, json: bool) -> None:
     argument = sys.argv[4]
     if name:
         response_data = search_by_name(target_item, argument)
-        print_search(response_data, json)
+        print_search(target_item, response_data, json)
     elif id:
         response_data = search_by_id(target_item, argument)
-        print_search(response_data, json)
+        print_search(target_item, response_data, json)
     elif type:
         response_data = search_by_type(target_item, argument)
-        print_search(response_data, json)
+        print_search(target_item, response_data, json)
 
 
 @click.command()

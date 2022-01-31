@@ -119,11 +119,11 @@ def request_data(base_url: str) -> list:
     except Exception as e:
         logger.error(e)
         console.print(
-            "Hmm, something went wrong. Please run [bold green]`xbot config`[/bold green] to make sure you have the required permissions."
+            "It looks like you're not logged in. Please run [bold green]`xbot config`[/bold green] to make sure you have the required permissions."
         )
 
 
-def print_search(response: dict, json: bool = False) -> None:
+def print_search(target_item: str, response: dict, json: bool = False) -> None:
     """Prints the data requested from the API.
 
     Args:
@@ -137,29 +137,68 @@ def print_search(response: dict, json: bool = False) -> None:
         if output_format == "json" or json:
             console.print_json(data=response_data)
         else:
-            table = Table(title="Results")
-            table.add_column("Name", justify="left", style="cyan", no_wrap=True)
-            table.add_column("State", justify="left", style="magenta", no_wrap=True)
-            table.add_column("Age (days)", justify="left", style="green", no_wrap=True)
-            table.add_column("ID", justify="left", style="blue", no_wrap=False)
-            n = 0
-            for item in response_data:
-                age = get_item_age(item)
-                n += 1
-                table.add_row(
-                    f'{n}. {item["name"]}',
-                    f'{item["node_state"]}',
-                    f"{age}",
-                    f'{item["id"]}',
-                )
-            console.print(table)
-            console.print(
-                f"\nHint: To view output in JSON format, append [bold cyan]--json[/bold cyan] or [bold cyan]-j[/bold cyan] to the previous command.\n"
-            )
+            if target_item == "node":
+                print_node_results(response_data)
+            elif target_item == "port":
+                print_port_results(response_data)
     else:
         console.print(
             "It looks like your access token has expired. Please run [bold cyan]xbot config -e <your_email> -p <your_password> [/bold cyan] to generate a new one."
         )
+
+
+def print_port_results(response_data: list):
+    """Utility function to print node data in a table structure
+
+    Args:
+        response_data (list): data returned from the request_data function
+    """
+    table = Table(title="Results")
+    table.add_column("Number", justify="left", style="cyan", no_wrap=True)
+    table.add_column("Name", justify="left", style="magenta", no_wrap=True)
+    table.add_column("State", justify="left", style="green", no_wrap=True)
+    table.add_column("Description", justify="left", style="blue", no_wrap=False)
+    table.add_column("Associated node", justify="left", style="cyan", no_wrap=True)
+    n = 0
+    for item in response_data:
+        table.add_row(
+            f'{item["port_number"]}',
+            f'{item["name"]}',
+            f'{item["port_state"]}',
+            f'{item["description"]}',
+            f'{item["node_id"]}',
+        )
+    console.print(table)
+    console.print(
+        f"\nHint: To view output in JSON format, append [bold cyan]--json[/bold cyan] or [bold cyan]-j[/bold cyan] to the previous command.\n"
+    )
+
+
+def print_node_results(response_data: list):
+    """Utility function to print port data in a table structure
+
+    Args:
+        response_data (list): data returned from the request_data function
+    """
+    table = Table(title="Results")
+    table.add_column("Name", justify="left", style="cyan", no_wrap=True)
+    table.add_column("State", justify="left", style="magenta", no_wrap=True)
+    table.add_column("Age (days)", justify="left", style="green", no_wrap=True)
+    table.add_column("ID", justify="left", style="blue", no_wrap=False)
+    n = 0
+    for item in response_data:
+        age = get_item_age(item)
+        n += 1
+        table.add_row(
+            f'{n}. {item["name"]}',
+            f'{item["node_state"]}',
+            f"{age}",
+            f'{item["id"]}',
+        )
+    console.print(table)
+    console.print(
+        f"\nHint: To view output in JSON format, append [bold cyan]--json[/bold cyan] or [bold cyan]-j[/bold cyan] to the previous command.\n"
+    )
 
 
 def get_item_age(item: str) -> str:
