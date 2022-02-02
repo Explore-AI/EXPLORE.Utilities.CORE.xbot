@@ -7,6 +7,7 @@ from xbot_commands.commands import (
     config,
     create,
     descendants,
+    destroy,
     ls,
     search,
     total,
@@ -60,10 +61,15 @@ node.add_command(search)
 node.add_command(create)
 node.add_command(descendants)
 node.add_command(ancestors)
+node.add_command(destroy)
 
 port.add_command(search)
 port.add_command(ls)
 port.add_command(total)
+
+interface.add_command(search)
+interface.add_command(ls)
+interface.add_command(total)
 
 if __name__ == "__main__":
     xbot()

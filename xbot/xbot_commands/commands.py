@@ -12,10 +12,10 @@ from rich.console import Console
 
 from xbot_commands.util_functions import (
     fetch_lineage,
-    generate_access_token,
     list_by_item_age,
     list_by_item_state,
     list_by_state_and_age,
+    print_interface_results,
     print_lineage,
     print_search,
     request_data,
@@ -79,22 +79,26 @@ def ls(ctx, all: str, state: str, age: int, json: bool = False) -> None:
     """
     target_item = sys.argv[1]
     base_url = f"http://localhost:3000/{target_item}s"
-    response_data = request_data(base_url)
-    if response_data is not None:
-        if state and age:
-            list_by_state_and_age(age, state, target_item, json)
-        elif state:
-            list_by_item_state(state, target_item, json)
-        elif age:
-            list_by_item_age(age, target_item, json)
-        elif all:
-            print_search(target_item, response_data, json)
+    response = request_data(base_url)
+    if target_item == "node" or target_item == "port":
+        if response is not None:
+            if state and age:
+                list_by_state_and_age(age, state, target_item, json)
+            elif state:
+                list_by_item_state(state, target_item, json)
+            elif age:
+                list_by_item_age(age, target_item, json)
+            elif all:
+                print_search(target_item, response, json)
+            else:
+                console.print(
+                    f"Hmm, I'm not sure what you want me to do. Try [bold green]`xbot {target_item} ls --all`[/bold green] to view all {target_item}s, or [bold green]`xbot {target_item} ls --help`[/bold green] for more options."
+                )
         else:
-            console.print(
-                f"Hmm, I'm not sure what you want me to do. Try [bold green]`xbot {target_item} ls --all`[/bold green] to view all {target_item}s, or [bold green]`xbot {target_item} ls --help`[/bold green] for more options."
-            )
-    else:
-        exit()
+            exit()
+    elif target_item == "interface":
+        if response is not None:
+            print_interface_results(response, json)
 
 
 @click.command()
@@ -118,14 +122,14 @@ def search(ctx: object, name: str, id: str, type: str, json: bool) -> None:
     target_item = sys.argv[1]
     argument = sys.argv[4]
     if name:
-        response_data = search_by_name(target_item, argument)
-        print_search(target_item, response_data, json)
+        response = search_by_name(target_item, argument)
+        print_search(target_item, response, json)
     elif id:
-        response_data = search_by_id(target_item, argument)
-        print_search(target_item, response_data, json)
+        response = search_by_id(target_item, argument)
+        print_search(target_item, response, json)
     elif type:
-        response_data = search_by_type(target_item, argument)
-        print_search(target_item, response_data, json)
+        response = search_by_type(target_item, argument)
+        print_search(target_item, response, json)
 
 
 @click.command()
@@ -134,9 +138,9 @@ def total() -> None:
     target_item = sys.argv[1]
     base_url = f"http://localhost:3000/{target_item}s"
     response = request_data(base_url)
-    response_data = response.json()
+    response = response.json()
     console.print(
-        f"There are [bold red]{len(response_data)} [/bold red]{target_item}s in your mesh."
+        f"There are [bold red]{len(response)} [/bold red]{target_item}s in your mesh."
         + "\n"
     )
 
@@ -166,15 +170,15 @@ def create(ctx: object, name: str, domain: str, cloud: str) -> None:
         "node_cloud_provider": cloud,
     }
 
-    response_data = requests.post(base_url, headers=headers, data=data)
-    if response_data.status_code == 201:
+    response = requests.post(base_url, headers=headers, data=data)
+    if response.status_code == 201:
         console.print("[bold green]Node successfully created[/bold green]\n")
         search_by_name(target_item, name)
         access_token = retrieve_access_token()
         logger.info(f"Node created by user with token {access_token}. Node ID: {name}")
     else:
         console.print(
-            f"There was an error creating your node. [bold red] Details:[/bold red] Status code - {response_data.status_code}. Message - {response_data.json()['message']}"
+            f"There was an error creating your node. [bold red] Details:[/bold red] Status code - {response.status_code}. Message - {response.json()['message']}"
         )
 
 
@@ -197,15 +201,15 @@ def destroy(name: str, id: str) -> None:
     headers["Prefer"] = "return=representation"
     confirm = console.print("Are you sure? y/n")
     if confirm == "y":
-        response_data = requests.delete(base_url, headers=headers)
-        if response_data.status_code == 204:
+        response = requests.delete(base_url, headers=headers)
+        if response.status_code == 204:
             console.print("[bold red]Node successfully destroyed[/bold red]\n")
             search_by_name(target_item, name)
             access_token = retrieve_access_token()
             logger.info(f"Node destroyed by user with token {access_token}.")
         else:
             console.print(
-                f"There was an error creating your node. [bold red] Details:[/bold red] Status code - {response_data.status_code}. Message - {response_data.json()['message']}"
+                f"There was an error creating your node. [bold red] Details:[/bold red] Status code - {response.status_code}. Message - {response.json()['message']}"
             )
     else:
         console.print("Aborted.")

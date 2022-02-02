@@ -141,6 +141,8 @@ def print_search(target_item: str, response: dict, json: bool = False) -> None:
                 print_node_results(response_data)
             elif target_item == "port":
                 print_port_results(response_data)
+            elif target_item == "interface":
+                print_interface_results(response_data)
     else:
         console.print(
             "It looks like your access token is not configured. Please run [bold cyan]xbot config -e <your_email> -p <your_password> [/bold cyan] to generate a new one."
@@ -199,6 +201,35 @@ def print_node_results(response_data: list):
     console.print(
         f"\nHint: To view output in JSON format, append [bold cyan]--json[/bold cyan] or [bold cyan]-j[/bold cyan] to the previous command.\n"
     )
+
+
+def print_interface_results(response: list, json: bool = False):
+    """Utility function to print port data in a table structure
+
+    Args:
+        response_data (list): data returned from the request_data function
+    """
+    response_data = response.json()
+    output_format = retrieve_output_format()
+    if output_format == "json" or json:
+        console.print_json(data=response_data)
+    else:
+        table = Table(title="Results")
+        table.add_column("Interface ID", justify="left", style="cyan", no_wrap=True)
+        table.add_column("Sub scheme", justify="left", style="blue", no_wrap=False)
+        table.add_column("Port number", justify="left", style="green", no_wrap=True)
+        table.add_column("Node ID", justify="left", style="magenta", no_wrap=True)
+        for item in response_data:
+            table.add_row(
+                f'{item["id"]}',
+                f'{item["interface_sub_scheme"]}',
+                f'{item["port_number"]}',
+                f'{item["node_id"]}',
+            )
+        console.print(table)
+        console.print(
+            f"\nHint: To view additional output in JSON format, append [bold cyan]--json[/bold cyan] or [bold cyan]-j[/bold cyan] to the previous command.\n"
+        )
 
 
 def get_item_age(item: str) -> str:
