@@ -67,7 +67,6 @@ port.add_command(search)
 port.add_command(ls)
 port.add_command(total)
 
-interface.add_command(search)
 interface.add_command(ls)
 interface.add_command(total)
 

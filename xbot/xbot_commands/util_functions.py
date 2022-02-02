@@ -145,7 +145,7 @@ def print_search(target_item: str, response: dict, json: bool = False) -> None:
                 print_interface_results(response_data)
     else:
         console.print(
-            "It looks like your access token is not configured. Please run [bold cyan]xbot config -e <your_email> -p <your_password> [/bold cyan] to generate a new one."
+            "Something has gone wrong. Please run [bold cyan]xbot config -e <your_email> -p <your_password> [/bold cyan] to ensure your permissions are configuired. If that doesn't work, please contact a member of the CORE team."
         )
 
 
@@ -209,7 +209,10 @@ def print_interface_results(response: list, json: bool = False):
     Args:
         response_data (list): data returned from the request_data function
     """
-    response_data = response.json()
+    try:
+        response_data = response.json()
+    except AttributeError:
+        response_data = response
     output_format = retrieve_output_format()
     if output_format == "json" or json:
         console.print_json(data=response_data)
@@ -343,7 +346,7 @@ def search_by_name(target_item: str, argument: str):
     return response_data
 
 
-def search_by_type(target_item, argument):
+def search_by_type(target_item: str, argument: str):
     """Search for an item by its ID.
 
     Args:
@@ -355,6 +358,22 @@ def search_by_type(target_item, argument):
     """
     base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?{target_item}_type=eq.{argument}"
+    response_data = request_data(request_url)
+    return response_data
+
+
+def search_by_interface(target_item: str, argument: str):
+    """Search for interfaces on a node.
+
+    Args:
+        target_item (str): the target item to be listed e.g. node, port or interface. Interface in this instance
+        argument (str): the node_id of the node you want to see the interfaces for
+
+    Returns:
+        list: a list of items matching the search criteria.
+    """
+    base_url = f"http://localhost:3000/{target_item}s"
+    request_url = f"{base_url}?node_id=eq.{argument}"
     response_data = request_data(request_url)
     return response_data
 

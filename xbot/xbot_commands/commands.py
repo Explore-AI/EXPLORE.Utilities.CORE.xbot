@@ -21,6 +21,7 @@ from xbot_commands.util_functions import (
     request_data,
     retrieve_access_token,
     search_by_id,
+    search_by_interface,
     search_by_name,
     search_by_type,
     store_access_token,
@@ -104,20 +105,21 @@ def ls(ctx, all: str, state: str, age: int, json: bool = False) -> None:
 @click.command()
 @click.option("--name", "-n", help="name of the node you're searching for")
 @click.option("--id", "-id", help="name of the node you're searching for")
+@click.option("--interface", help="provide the node_id to view interfaces on that node")
 @click.option(
     "--type",
     help="type of the node you're searching for",
     type=click.Choice(ITEM_TYPES),
 )
 @click.option("--json", "-j", is_flag=True, help="print more output.")
-@click.pass_context
-def search(ctx: object, name: str, id: str, type: str, json: bool) -> None:
+def search(name: str, id: str, type: str, interface: str, json: bool) -> None:
     """Search for a specific item.
 
     Args:
         name (str): name of the item you're searching for
         id (str): ID of the item you're searching for
         json (bool): whether to print the data in JSON format. Defaults to False.
+        interface (str): provide the node_id to view all interfaces on that node
     """
     target_item = sys.argv[1]
     argument = sys.argv[4]
@@ -130,6 +132,9 @@ def search(ctx: object, name: str, id: str, type: str, json: bool) -> None:
     elif type:
         response = search_by_type(target_item, argument)
         print_search(target_item, response, json)
+    elif interface:
+        response = search_by_interface("interface", argument)
+        print_search("interface", response, json)
 
 
 @click.command()
