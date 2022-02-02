@@ -296,7 +296,7 @@ def search_by_id(target_item, argument):
     return response_data
 
 
-def search_by_name(target_item, argument):
+def search_by_name(target_item: str, argument: str):
     """Search for an item by its ID.
 
     Args:

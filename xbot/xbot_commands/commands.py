@@ -133,9 +133,10 @@ def total() -> None:
     """This command lists the total number of items present in the mesh. Example: `xbot node list --total` will list the total number of items in the mesh."""
     target_item = sys.argv[1]
     base_url = f"http://localhost:3000/{target_item}s"
-    response_data = request_data(base_url)
+    response = request_data(base_url)
+    response_data = response.json()
     console.print(
-        f"The total number of {target_item}s in your mesh is: [bold red]{len(response_data)} [/bold red]"
+        f"There are [bold red]{len(response_data)} [/bold red]{target_item}s in your mesh."
         + "\n"
     )
 
@@ -151,7 +152,7 @@ def total() -> None:
 @click.pass_context
 def create(ctx: object, name: str, domain: str, cloud: str) -> None:
     """This command creates a new item in the mesh. Example: `xbot node create --name "my_node" --domain "waste.water" --cloud aws` will create a new node."""
-    access_token = generate_access_token()
+    access_token = retrieve_access_token()
     target_item = sys.argv[1]
     base_url = f"http://localhost:3000/{target_item}s"
     headers = CaseInsensitiveDict()
@@ -175,6 +176,39 @@ def create(ctx: object, name: str, domain: str, cloud: str) -> None:
         console.print(
             f"There was an error creating your node. [bold red] Details:[/bold red] Status code - {response_data.status_code}. Message - {response_data.json()['message']}"
         )
+
+
+@click.command()
+@click.option("--name", "-n", help="name of the item you're creating", type=str)
+@click.option("--id", help="domain of the item you're creating", type=str)
+@click.pass_context
+def destroy(name: str, id: str) -> None:
+    """This command destroys a node that is present in your mesh. Example: `xbot node destory --name "my_node" --domain "waste.water" --cloud aws` will create a new node."""
+    access_token = retrieve_access_token()
+    target_item = sys.argv[1]
+    print(target_item)
+    if name:
+        base_url = f"http://localhost:3000/{target_item}s?name=phfts.{name}"
+    elif id:
+        base_url = f"http://localhost:3000/{target_item}s?id=eq.{id}"
+    headers = CaseInsensitiveDict()
+    headers["Accept"] = "application/vnd.pgrst.object+json"
+    headers["Authorization"] = f"Bearer {access_token}"
+    headers["Prefer"] = "return=representation"
+    confirm = console.print("Are you sure? y/n")
+    if confirm == "y":
+        response_data = requests.delete(base_url, headers=headers)
+        if response_data.status_code == 204:
+            console.print("[bold red]Node successfully destroyed[/bold red]\n")
+            search_by_name(target_item, name)
+            access_token = retrieve_access_token()
+            logger.info(f"Node destroyed by user with token {access_token}.")
+        else:
+            console.print(
+                f"There was an error creating your node. [bold red] Details:[/bold red] Status code - {response_data.status_code}. Message - {response_data.json()['message']}"
+            )
+    else:
+        console.print("Aborted.")
 
 
 @click.command()
