@@ -6,7 +6,6 @@ azure-core==1.21.1
 azure-nspkg==3.0.2
 azure-storage==0.36.0
 azure-storage-blob==12.9.0
--e git+https://github.com/KeaganStokoe/biblioCLI.git@550246022b46b7f1985598ac776cb80d1eddbbc8#egg=BiblioCLI&subdirectory=bibliocli
 black==21.6b0
 certifi==2021.10.8
 cffi==1.15.0
@@ -75,5 +74,4 @@ virtualenv==20.13.0
 virtualenv-clone==0.5.4
 virtualenvwrapper==4.8.4
 wrapt==1.13.3
--e git+https://github.com/Explore-AI/EXPLORE.Utilities.CORE.xbot@9188ff65d97b37c0b597814dc4446626ff2c3be2#egg=xbot
 zope.interface==5.4.0
