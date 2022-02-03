@@ -68,17 +68,26 @@ def config(email: str, password: str, json: bool) -> None:
 @click.option(
     "--age", help="list items provisioned within a certain timeframe", type=int
 )
+@click.option("--interface", help="provide the node_id to view interfaces on that node")
+@click.option(
+    "--type",
+    help="type of the node you're searching for",
+    type=click.Choice(ITEM_TYPES),
+)
 @click.option("--json", "-j", is_flag=True, help="print more output.")
-@click.pass_context
-def ls(ctx, all: str, state: str, age: int, json: bool = False) -> None:
+def ls(
+    all: str, state: str, age: int, interface: str, type: str, json: bool = False
+) -> None:
     """List items in the mesh. Example: `xbot node ls --5` will list the 5 most recent items.
 
     Args:
         age (int): number of days search criteria should apply to.
         state (str): list items by state. Defaults to all states available.
+        interface (str): provide the node_id to view all interfaces on that node
         json (bool): whether to print the data in JSON format. Defaults to False.
     """
     target_item = sys.argv[1]
+    paramater = sys.argv[4]
     base_url = f"http://localhost:3000/{target_item}s"
     response = request_data(base_url)
     if target_item == "node" or target_item == "port":
@@ -90,6 +99,12 @@ def ls(ctx, all: str, state: str, age: int, json: bool = False) -> None:
             elif age:
                 list_by_item_age(age, target_item, json)
             elif all:
+                print_search(target_item, response, json)
+            elif interface:
+                response = search_by_interface("interface", paramater)
+                print_search("interface", response, json)
+            elif type:
+                response = search_by_type(target_item, paramater)
                 print_search(target_item, response, json)
             else:
                 console.print(
@@ -105,21 +120,14 @@ def ls(ctx, all: str, state: str, age: int, json: bool = False) -> None:
 @click.command()
 @click.option("--name", "-n", help="name of the node you're searching for")
 @click.option("--id", "-id", help="name of the node you're searching for")
-@click.option("--interface", help="provide the node_id to view interfaces on that node")
-@click.option(
-    "--type",
-    help="type of the node you're searching for",
-    type=click.Choice(ITEM_TYPES),
-)
 @click.option("--json", "-j", is_flag=True, help="print more output.")
-def search(name: str, id: str, type: str, interface: str, json: bool) -> None:
+def search(name: str, id: str, json: bool) -> None:
     """Search for a specific item.
 
     Args:
         name (str): name of the item you're searching for
         id (str): ID of the item you're searching for
         json (bool): whether to print the data in JSON format. Defaults to False.
-        interface (str): provide the node_id to view all interfaces on that node
     """
     target_item = sys.argv[1]
     argument = sys.argv[4]
@@ -129,12 +137,6 @@ def search(name: str, id: str, type: str, interface: str, json: bool) -> None:
     elif id:
         response = search_by_id(target_item, argument)
         print_search(target_item, response, json)
-    elif type:
-        response = search_by_type(target_item, argument)
-        print_search(target_item, response, json)
-    elif interface:
-        response = search_by_interface("interface", argument)
-        print_search("interface", response, json)
 
 
 @click.command()
