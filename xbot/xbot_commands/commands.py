@@ -32,7 +32,7 @@ VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
 
 
 CLOUD_PROVIDERS = ["aws", "azure", "gcp"]
-ITEM_TYPES = ["operational", "enrichment"]
+ITEM_TYPES = ["operational", "digital-twin", "aggregate"]
 ITEM_STATES = ["provisioned", "started", "active", "error", "stopped", "suspended"]
 
 logger = logging.getLogger()
