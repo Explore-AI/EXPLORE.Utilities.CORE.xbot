@@ -68,7 +68,10 @@ def config(email: str, password: str, json: bool) -> None:
 @click.option(
     "--age", help="list items provisioned within a certain timeframe", type=int
 )
-@click.option("--interface", help="provide the node_id to view interfaces on that node")
+@click.option(
+    "--interface",
+    help="provide the node_id to view interfaces on that node: `xbot node ls --interface <node_id>`",
+)
 @click.option(
     "--type",
     help="type of the node you're searching for",
@@ -83,11 +86,14 @@ def ls(
     Args:
         age (int): number of days search criteria should apply to.
         state (str): list items by state. Defaults to all states available.
-        interface (str): provide the node_id to view all interfaces on that node
+        interface (str): provide the node_id to view all interfaces on that node. Example: `xbot node ls --interface <node_id>`
         json (bool): whether to print the data in JSON format. Defaults to False.
     """
     target_item = sys.argv[1]
-    paramater = sys.argv[4]
+    if len(sys.argv) > 4:
+        paramater = sys.argv[4]
+    else:
+        paramater = None
     base_url = f"http://localhost:3000/{target_item}s"
     response = request_data(base_url)
     if target_item == "node" or target_item == "port":

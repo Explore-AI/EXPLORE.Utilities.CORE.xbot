@@ -219,7 +219,7 @@ def print_interface_results(response: list, json: bool = False):
     else:
         table = Table(title="Results")
         table.add_column("Interface ID", justify="left", style="cyan", no_wrap=True)
-        table.add_column("Sub scheme", justify="left", style="blue", no_wrap=False)
+        table.add_column("Sub scheme", justify="left", style="blue", no_wrap=True)
         table.add_column("Port number", justify="left", style="green", no_wrap=True)
         table.add_column("Node ID", justify="left", style="magenta", no_wrap=True)
         for item in response_data:
