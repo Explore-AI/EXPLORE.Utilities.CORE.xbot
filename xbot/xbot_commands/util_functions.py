@@ -276,7 +276,7 @@ def list_by_state_and_age(
     request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}&{target_item}_state=eq.{state}"
     response = request_data(request_url)
     if response:
-        print_search(target_item, response, json)
+        return response
     else:
         console.print(
             "We're having some trouble authenticating your profile. Please run [bold cyan]xbot config -e <your_email> -p <your_password> [/bold cyan] to login."
@@ -300,7 +300,7 @@ def list_by_type_and_age(
     request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}&{target_item}_type=eq.{type}"
     response = request_data(request_url)
     if response:
-        print_search(target_item, response, json)
+        return response
     else:
         print_error_message()
 
@@ -322,7 +322,7 @@ def list_by_type_and_state(
     request_url = f"{base_url}?select=*&{target_item}_state=eq.{state}&{target_item}_type=eq.{type}"
     response = request_data(request_url)
     if response:
-        print_search(target_item, response, json)
+        return response
     else:
         print_error_message()
 
@@ -338,7 +338,7 @@ def list_by_item_state(state: str, target_item: str = "node", json: bool = False
     request_url = f"{base_url}?select=*&{target_item}_state=eq.{state}"
     response_data = request_data(request_url)
     if response_data:
-        print_search(target_item, response_data, json)
+        return response_data
     else:
         logger.info(f"No {target_item}s with state '{state}' found.")
 
@@ -354,9 +354,9 @@ def list_by_item_age(age: int, target_item: str = "node", json: bool = False):
     from_datetime = datetime.datetime.now() - datetime.timedelta(age)
     base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}"
-    response_data = request_data(request_url)
-    if response_data:
-        print_search(target_item, response_data, json)
+    response = request_data(request_url)
+    if response:
+        return response
     else:
         logger.info(f"No {target_item}s provisioned within the last {age} days.")
 

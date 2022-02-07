@@ -106,13 +106,17 @@ def ls(
             if all:
                 print_search(target_item, response, json)
             elif state and age:
-                list_by_state_and_age(age, state, target_item, json)
+                response = list_by_state_and_age(age, state, target_item, json)
+                print_search(target_item, response, json)
             elif type and age:
-                list_by_type_and_age(age, type, target_item, json)
+                response = list_by_type_and_age(age, type, target_item, json)
+                print_search(target_item, response, json)
             elif type and state:
-                list_by_type_and_state(type, state, target_item, json)
+                response = list_by_type_and_state(type, state, target_item, json)
+                print_search(target_item, response, json)
             elif state:
-                list_by_item_state(state, target_item, json)
+                response = list_by_item_state(state, target_item, json)
+                print_search(target_item, response, json)
             elif type:
                 response = search_by_type(target_item, paramater)
                 print_search(target_item, response, json)
@@ -120,7 +124,8 @@ def ls(
                 response = search_by_interface("interface", paramater)
                 print_search("interface", response, json)
             elif age:
-                list_by_item_age(age, target_item, json)
+                response = list_by_item_age(age, target_item, json)
+                print_search(target_item, response, json)
             else:
                 console.print(
                     f"Hmm, I'm not sure what you want me to do. Try [bold green]`xbot {target_item} ls --all`[/bold green] to view all {target_item}s, or [bold green]`xbot {target_item} ls --help`[/bold green] for more options."
