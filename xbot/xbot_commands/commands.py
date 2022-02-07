@@ -15,6 +15,7 @@ from xbot_commands.util_functions import (
     list_by_item_age,
     list_by_item_state,
     list_by_state_and_age,
+    list_by_type_and_age,
     print_interface_results,
     print_lineage,
     print_search,
@@ -105,20 +106,22 @@ def ls(
     response = request_data(base_url)
     if target_item == "node" or target_item == "port":
         if response is not None:
-            if state and age:
+            if all:
+                print_search(target_item, response, json)
+            elif state and age:
                 list_by_state_and_age(age, state, target_item, json)
+            elif type and age:
+                list_by_type_and_age(age, type, target_item, json)
             elif state:
                 list_by_item_state(state, target_item, json)
-            elif age:
-                list_by_item_age(age, target_item, json)
-            elif all:
+            elif type:
+                response = search_by_type(target_item, paramater)
                 print_search(target_item, response, json)
             elif interface:
                 response = search_by_interface("interface", paramater)
                 print_search("interface", response, json)
-            elif type:
-                response = search_by_type(target_item, paramater)
-                print_search(target_item, response, json)
+            elif age:
+                list_by_item_age(age, target_item, json)
             else:
                 console.print(
                     f"Hmm, I'm not sure what you want me to do. Try [bold green]`xbot {target_item} ls --all`[/bold green] to view all {target_item}s, or [bold green]`xbot {target_item} ls --help`[/bold green] for more options."
