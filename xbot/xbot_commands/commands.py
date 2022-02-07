@@ -29,10 +29,6 @@ from xbot_commands.util_functions import (
     store_access_token,
 )
 
-FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
-
-
 CLOUD_PROVIDERS = ["aws", "azure", "gcp"]
 ITEM_TYPES = ["operational", "digital-twin", "aggregate"]
 ITEM_STATES = ["provisioned", "started", "active", "error", "stopped", "suspended"]

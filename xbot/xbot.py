@@ -4,26 +4,11 @@ import click
 
 from xbot_commands.commands import ancestors, config, descendants, ls, search, total
 
-FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
-
-logger = logging.getLogger()
-
 
 @click.group()
-@click.option(
-    "--log-level",
-    type=click.Choice(VALID_LOG_LEVELS),
-    default="info",
-    help="The desired log level",
-)
-def xbot(log_level: str) -> None:
-    logging.basicConfig(
-        format=FORMATTER,
-        level=getattr(logging, log_level.upper()),
-        filename="xbot_log.log",
-    )
-    logger.debug(f"Log level: {log_level.upper()}")
+def xbot() -> None:
+    """Main CLI entrypoint for xbot."""
+    pass
 
 
 @xbot.group()
