@@ -64,29 +64,36 @@ def config(email: str, password: str, json: bool) -> None:
 
 @click.command()
 @click.option("--all", "-a", help="list all items", is_flag=True)
-@click.option("--state", help="list items by state", type=click.Choice(ITEM_STATES))
 @click.option(
-    "--age", help="list items provisioned within a certain timeframe", type=int
+    "--state",
+    help="list items by state e.g. xbot node ls --state active",
+    type=click.Choice(ITEM_STATES),
+)
+@click.option(
+    "--type",
+    help="list by item type e.g. xbot node ls --type operational",
+    type=click.Choice(ITEM_TYPES),
 )
 @click.option(
     "--interface",
     help="provide the node_id to view interfaces on that node: `xbot node ls --interface <node_id>`",
 )
 @click.option(
-    "--type",
-    help="type of the node you're searching for",
-    type=click.Choice(ITEM_TYPES),
+    "--age",
+    help="list items provisioned within a certain timeframe e.g. xbot node ls --age 55",
+    type=int,
 )
 @click.option("--json", "-j", is_flag=True, help="print more output.")
 def ls(
     all: str, state: str, age: int, interface: str, type: str, json: bool = False
 ) -> None:
-    """List items in the mesh. Example: `xbot node ls --5` will list the 5 most recent items.
+    """List items in the mesh.
 
     Args:
-        age (int): number of days search criteria should apply to.
         state (str): list items by state. Defaults to all states available.
+        type (str): list items by type.
         interface (str): provide the node_id to view all interfaces on that node. Example: `xbot node ls --interface <node_id>`
+        age (int): number of days search criteria should apply to.
         json (bool): whether to print the data in JSON format. Defaults to False.
     """
     target_item = sys.argv[1]
