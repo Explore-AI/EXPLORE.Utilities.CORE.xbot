@@ -1,10 +1,10 @@
 import unittest
 
 from xbot.xbot_commands.commands import ls
-from xbot.xbot_commands.util_functions import request_data
+from xbot.xbot_commands.util_functions import list_by_item_state, request_data
 
 
-class SimpleTest(unittest.TestCase):
+class TestListNodes(unittest.TestCase):
     def test_list_all_nodes_not_empty(self):
         """Test that the list of nodes is not empty."""
         base_url = f"http://localhost:3000/nodes"
@@ -67,6 +67,13 @@ class SimpleTest(unittest.TestCase):
         response = request_data(base_url)
         node_list = response.json()
         self.assertTrue("date_created" in node_list[0])
+
+    def test_total_nodes_is_an_integer(self):
+        """Test that the value returned by the total command is an integer."""
+        base_url = f"http://localhost:3000/nodes/total"
+        response = request_data(base_url)
+        total_nodes = response.json()
+        self.assertIsInstance(len(total_nodes), int)
 
 
 if __name__ == "__main__":
