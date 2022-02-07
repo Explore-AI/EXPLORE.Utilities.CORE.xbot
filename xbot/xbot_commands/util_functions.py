@@ -293,12 +293,33 @@ def list_by_type_and_age(
 
     Args:
         age (int): number of days search criteria should apply to.
-        state (string): ["provisioned", "started", "active", "error", "stopped", "suspended"]
         target_item (str): the target item to be listed e.g. node, port or interface. Defaults to node.
     """
     from_datetime = datetime.datetime.now() - datetime.timedelta(age)
     base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}&{target_item}_type=eq.{type}"
+    response = request_data(request_url)
+    if response:
+        print_search(target_item, response, json)
+    else:
+        print_error_message()
+
+
+def list_by_type_and_state(
+    type: str,
+    state: str,
+    target_item: str = "node",
+    json: bool = False,
+):
+    """List items based on their state AND age.
+
+    Args:
+        type (str): the type of node to be listed e.g. operational, digital-twin or aggregate.
+        state (string): ["provisioned", "started", "active", "error", "stopped", "suspended"]
+        target_item (str): the target item to be listed e.g. node, port or interface. Defaults to node.
+    """
+    base_url = f"http://localhost:3000/{target_item}s"
+    request_url = f"{base_url}?select=*&{target_item}_state=eq.{state}&{target_item}_type=eq.{type}"
     response = request_data(request_url)
     if response:
         print_search(target_item, response, json)

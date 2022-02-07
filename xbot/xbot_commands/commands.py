@@ -16,6 +16,7 @@ from xbot_commands.util_functions import (
     list_by_item_state,
     list_by_state_and_age,
     list_by_type_and_age,
+    list_by_type_and_state,
     print_interface_results,
     print_lineage,
     print_search,
@@ -112,6 +113,8 @@ def ls(
                 list_by_state_and_age(age, state, target_item, json)
             elif type and age:
                 list_by_type_and_age(age, type, target_item, json)
+            elif type and state:
+                list_by_type_and_state(type, state, target_item, json)
             elif state:
                 list_by_item_state(state, target_item, json)
             elif type:
