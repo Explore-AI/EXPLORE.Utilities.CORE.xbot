@@ -133,20 +133,23 @@ def print_search(target_item: str, response: dict, json: bool = False) -> None:
 
     if response.status_code == 200:
         response_data = response.json()
-        output_format = retrieve_output_format()
-        if output_format == "json" or json:
-            console.print_json(data=response_data)
+        if len(response_data) == 0:
+            console.print(
+                "Your query returned no results. Please refine your search and try again."
+            )
         else:
-            if target_item == "node":
-                print_node_results(response_data)
-            elif target_item == "port":
-                print_port_results(response_data)
-            elif target_item == "interface":
-                print_interface_results(response_data)
+            output_format = retrieve_output_format()
+            if output_format == "json" or json:
+                console.print_json(data=response_data)
+            else:
+                if target_item == "node":
+                    print_node_results(response_data)
+                elif target_item == "port":
+                    print_port_results(response_data)
+                elif target_item == "interface":
+                    print_interface_results(response_data)
     else:
-        console.print(
-            "Something has gone wrong. Please run [bold cyan]xbot config -e <your_email> -p <your_password> [/bold cyan] to ensure your permissions are configuired. If that doesn't work, please contact a member of the CORE team."
-        )
+        print_error_message()
 
 
 def print_port_results(response_data: list):
@@ -449,3 +452,15 @@ def print_lineage(
         console.print(
             "It looks like your access token has expired. Please run [bold cyan]xbot config -e <your_email> -p <your_password> [/bold cyan] to generate a new one."
         )
+
+
+def print_error_message() -> None:
+    """Prints an error message with troubleshooting support if an error occurs."""
+    console.print(
+        """
+            Something went wrong. Try these troubleshooting methods:
+
+            1. Run [bold green]xbot config -e <your_email> -p <your_password> [/bold green] to ensure your permissions are configuired.
+            2. Contact a member of the CORE team at [bold]core-platform@explore-utilities.com[/bold]
+            """
+    )
