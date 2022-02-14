@@ -94,7 +94,7 @@ def ls(
         age (int): number of days search criteria should apply to.
         json (bool): whether to print the data in JSON format. Defaults to False.
     """
-    target_item = sys.argv[1]
+    target_item = sys.argv[1] if len(sys.argv) > 1 else "node"
     if len(sys.argv) > 4:
         paramater = sys.argv[4]
     else:
