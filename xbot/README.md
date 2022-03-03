@@ -47,7 +47,7 @@ The following commands are available on the command line interface, with their u
 - `-delete_port`: allows you to delete a port by providing the port number and the node ID of the node where the port can be found. Example: `-delete_port 3000 43584d4d8d6ee7f879f6ca9e38e164d21b19576ddfd0231dfe9354caddc9b471` will delete port 3000 on the node with the given ID. It's necessary to supply both the port number and the node ID because a port with the same number can exist on multiple nodes.
 ---
 ### Querying interfaces:
-- `python xbot.py -i` or `python xbot.py -interface`: allows you to retrieve the interface for a specific node by proving a node ID. Example: `python xbot.py -interface 43584d4d8d6ee7f879f6ca9e38e164d21b19576ddfd0231dfe9354caddc9b471`
+- `-i` or `-interface`: allows you to retrieve the interface for a specific node by proving a node ID. Example: `-interface 43584d4d8d6ee7f879f6ca9e38e164d21b19576ddfd0231dfe9354caddc9b471`
 
 # Request for feedback
 
