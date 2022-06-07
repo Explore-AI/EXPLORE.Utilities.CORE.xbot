@@ -2,34 +2,34 @@ import logging
 
 import click
 
-from xbot_commands.commands import ancestors, config, descendants, ls, search, total
+from xbot.commands.commands import ancestors, config, descendants, ls, search, total
 
 
 @click.group()
-def xbot() -> None:
+def cli() -> None:
     """Main CLI entrypoint for xbot."""
     pass
 
 
-@xbot.group()
+@cli.group()
 def node() -> None:
     """Inspect nodes running in the mesh."""
     pass
 
 
-@xbot.group()
+@cli.group()
 def port() -> None:
     """Inspect ports on nodes running in the mesh."""
     pass
 
 
-@xbot.group()
+@cli.group()
 def interface() -> None:
     """Inspect interfaces running in the mesh."""
     pass
 
 
-xbot.add_command(config)
+cli.add_command(config)
 
 node.add_command(ls)
 node.add_command(total)
@@ -43,6 +43,3 @@ port.add_command(total)
 
 interface.add_command(ls)
 interface.add_command(total)
-
-if __name__ == "__main__":
-    xbot()

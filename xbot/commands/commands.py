@@ -10,7 +10,7 @@ from requests.structures import CaseInsensitiveDict
 from rich import print
 from rich.console import Console
 
-from xbot_commands.util_functions import (
+from xbot.commands.util_functions import (
     fetch_lineage,
     list_by_item_age,
     list_by_item_state,

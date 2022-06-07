@@ -4,12 +4,12 @@
 """
 from click.testing import CliRunner
 
-from xbot import xbot
+from xbot.cli import cli
 
 
 def test_ls():
     runner = CliRunner()
-    result = runner.invoke(xbot, ["node", "ls", "--all"])
+    result = runner.invoke(cli, ["node", "ls", "--all"])
     assert result.exit_code == 0
     assert "Name" in result.output
 

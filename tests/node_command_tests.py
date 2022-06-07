@@ -1,7 +1,7 @@
 import unittest
 
-from xbot.xbot_commands.commands import ls
-from xbot.xbot_commands.util_functions import list_by_item_state, request_data
+from xbot.commands.commands import ls
+from xbot.commands.util_functions import list_by_item_state, request_data
 
 
 class TestListNodes(unittest.TestCase):

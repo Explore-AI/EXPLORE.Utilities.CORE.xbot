@@ -1,5 +1,3 @@
-from importlib.metadata import entry_points
-
 from setuptools import find_packages, setup
 
 REQUIREMENTS_FILE = "requirements.txt"
@@ -19,7 +17,7 @@ setup(
     install_requires=read_requirements(),
     entry_points={
         "console_scripts": [
-            "xbot = xbot:xbot",
+            "xbot = xbot.cli:cli",
         ],
     },
 )
