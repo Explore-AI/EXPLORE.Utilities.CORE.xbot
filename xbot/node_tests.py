@@ -1,6 +1,8 @@
 """
-    Before running these tests, make sure that you've generated the required auth token by running `xbot config -e <email> -p <password>`.
-    The tests will fail without it, and the native error messages are not very explicit about this.
+    Before running these tests, make sure that you've generated the required
+    auth token by running `xbot config -e <email> -p <password>`.
+    The tests will fail without it, and the native error messages are not very
+    explicit about this.
 """
 from click.testing import CliRunner
 

@@ -1,5 +1,3 @@
-import logging
-
 import click
 
 from xbot.commands.commands import ancestors, config, descendants, ls, search, total
