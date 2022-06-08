@@ -1,13 +1,8 @@
-import json
 import logging
-import os
 import sys
 
 import click
-import requests
 
-from requests.structures import CaseInsensitiveDict
-from rich import print
 from rich.console import Console
 
 from xbot.commands.util_functions import (
@@ -74,7 +69,10 @@ def config(email: str, password: str, json: bool) -> None:
 )
 @click.option(
     "--interface",
-    help="provide the node_id to view interfaces on that node: `xbot node ls --interface <node_id>`",
+    help=(
+        "provide the node_id to view interfaces on that node: "
+        "`xbot node ls --interface <node_id>`"
+    ),
 )
 @click.option(
     "--age",
@@ -90,7 +88,8 @@ def ls(
     Args:
         state (str): list items by state. Defaults to all states available.
         type (str): list items by type.
-        interface (str): provide the node_id to view all interfaces on that node. Example: `xbot node ls --interface <node_id>`
+        interface (str): provide the node_id to view all interfaces on that node.
+            Example: `xbot node ls --interface <node_id>`
         age (int): number of days search criteria should apply to.
         json (bool): whether to print the data in JSON format. Defaults to False.
     """
@@ -128,7 +127,13 @@ def ls(
                 print_search(target_item, response, json)
             else:
                 console.print(
-                    f"Hmm, I'm not sure what you want me to do. Try [bold green]`xbot {target_item} ls --all`[/bold green] to view all {target_item}s, or [bold green]`xbot {target_item} ls --help`[/bold green] for more options."
+                    (
+                        "Hmm, I'm not sure what you want me to do. "
+                        f"Try [bold green]`xbot {target_item} ls --all`[/bold green] "
+                        f"to view all {target_item}s, or "
+                        "[bold green]`xbot {target_item} ls --help`[/bold green] "
+                        "for more options."
+                    )
                 )
         else:
             exit()
@@ -161,7 +166,11 @@ def search(name: str, id: str, json: bool) -> None:
 
 @click.command()
 def total() -> None:
-    """This command lists the total number of items present in the mesh. Example: `xbot node list --total` will list the total number of items in the mesh."""
+    """
+    List the total number of items present in the mesh. Example:
+        `xbot node list --total`
+        will list the total number of items in the mesh.
+    """
     target_item = sys.argv[1]
     base_url = f"http://localhost:3000/{target_item}s"
     response = request_data(base_url)
@@ -182,7 +191,9 @@ def descendants(id: str, tree: bool = False, json: bool = False) -> None:
     Args:
         id (str): Node ID of the node you wish to view ancestors of.
 
-        Example: `xbot node descendants {node_id}`. Hint: If you're uncertain of the ID of a node, use the `xbot node ls` command to find it.
+        Example: `xbot node descendants {node_id}`.
+        Hint: If you're uncertain of the ID of a node, use the
+        `xbot node ls` command to find it.
     """
     requested_data = fetch_lineage(id)
     print_lineage(requested_data, id, "descendant", tree, json)
@@ -198,7 +209,9 @@ def ancestors(id: str, tree: bool = False, json: bool = False) -> None:
     Args:
         id (str): Node ID of the node you wish to view ancestors of.
 
-        Example: `xbot node ancestors {node_id}`. Hint: If you're uncertain of the ID of a node, use the `xbot node ls` command to find it.
+        Example: `xbot node ancestors {node_id}`.
+        Hint: If you're uncertain of the ID of a node, use the
+        `xbot node ls` command to find it.
     """
 
     requested_data = fetch_lineage(id)
