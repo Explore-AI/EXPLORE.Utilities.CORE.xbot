@@ -27,8 +27,9 @@ from xbot.commands.util_functions import (
 CLOUD_PROVIDERS = ["aws", "azure", "gcp"]
 ITEM_TYPES = ["operational", "digital-twin", "aggregate"]
 ITEM_STATES = ["provisioned", "started", "active", "error", "stopped", "suspended"]
+BASE_URL = "http://localhost:3000"
 
-logger = logging.getLogger()
+logger = logging.getLogger(__name__)
 console = Console(record=True)
 
 
@@ -40,6 +41,7 @@ def config(email: str, password: str, json: bool) -> None:
     """Stores access token and global settings of the user.
 
     Args:
+        url (str): Mesh API url TODO
         email (str): user email
         password (str): user password
     """
@@ -95,11 +97,11 @@ def ls(
     """
     target_item = sys.argv[1] if len(sys.argv) > 1 else "node"
     if len(sys.argv) > 4:
-        paramater = sys.argv[4]
+        parameter = sys.argv[4]
     else:
-        paramater = None
-    base_url = f"http://localhost:3000/{target_item}s"
-    response = request_data(base_url)
+        parameter = None
+    url = f"{BASE_URL}/{target_item}s"
+    response = request_data(url)
     if target_item == "node" or target_item == "port":
         if response is not None:
             if all:
@@ -117,10 +119,10 @@ def ls(
                 response = list_by_item_state(state, target_item, json)
                 print_search(target_item, response, json)
             elif type:
-                response = search_by_type(target_item, paramater)
+                response = search_by_type(target_item, parameter)
                 print_search(target_item, response, json)
             elif interface:
-                response = search_by_interface("interface", paramater)
+                response = search_by_interface("interface", parameter)
                 print_search("interface", response, json)
             elif age:
                 response = list_by_item_age(age, target_item, json)
@@ -135,11 +137,28 @@ def ls(
                         "for more options."
                     )
                 )
-        else:
-            exit()
-    elif target_item == "interface":
-        if response is not None:
-            print_interface_results(response, json)
+
+
+@click.command()
+@click.option(
+    "--include-schema",
+    is_flag=True,
+    help="Include schema definition functions in output.",
+)
+@click.option("--json", "-j", is_flag=True, help="print more output.")
+def ls_interfaces(
+    include_schema: bool = False,
+    json: bool = False,
+) -> None:
+    """List items in the mesh.
+
+    Args:
+        json (bool): whether to print the data in JSON format. Defaults to False.
+    """
+    url = f"{BASE_URL}/interfaces"
+    response = request_data(url)
+    if response is not None:
+        print_interface_results(response, include_schema, json)
 
 
 @click.command()
@@ -172,8 +191,8 @@ def total() -> None:
         will list the total number of items in the mesh.
     """
     target_item = sys.argv[1]
-    base_url = f"http://localhost:3000/{target_item}s"
-    response = request_data(base_url)
+    url = f"{BASE_URL}/{target_item}s"
+    response = request_data(url)
     response = response.json()
     console.print(
         f"There are [bold red]{len(response)} [/bold red]{target_item}s in your mesh."

@@ -1,6 +1,14 @@
 import click
 
-from xbot.commands.commands import ancestors, config, descendants, ls, search, total
+from xbot.commands.commands import (
+    ancestors,
+    config,
+    descendants,
+    ls,
+    ls_interfaces,
+    search,
+    total,
+)
 
 
 @click.group()
@@ -39,5 +47,5 @@ port.add_command(search)
 port.add_command(ls)
 port.add_command(total)
 
-interface.add_command(ls)
+interface.add_command(ls_interfaces)
 interface.add_command(total)

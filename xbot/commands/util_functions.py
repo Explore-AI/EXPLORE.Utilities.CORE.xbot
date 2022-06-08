@@ -23,6 +23,8 @@ console = Console()
 FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
 
+BASE_URL = "http://localhost:3000"
+
 
 logger = logging.getLogger()
 
@@ -34,7 +36,7 @@ def generate_access_token(email: str, password: str) -> str:
         str: JWT access token that is used in the headers of all requests.
     """
     try:
-        url = "http://localhost:3000/rpc/login"
+        url = f"{BASE_URL}/rpc/login"
         response = requests.post(url, json={"email": email, "password": password})
         if response.status_code == 200:
             token = response.json()["token"]
@@ -178,10 +180,6 @@ def print_port_results(response_data: list):
             f'{item["node_id"]}',
         )
     console.print(table)
-    console.print(
-        "\nHint: To view output in JSON format, append [bold cyan]--json[/bold cyan] "
-        "or [bold cyan]-j[/bold cyan] to the previous command.\n"
-    )
 
 
 def print_node_results(response_data: list):
@@ -206,19 +204,16 @@ def print_node_results(response_data: list):
             f'{item["id"]}',
         )
     console.print(table)
-    console.print(
-        "\nHint: To view output in JSON format, append [bold cyan]--json[/bold cyan] "
-        "or [bold cyan]-j[/bold cyan] to the previous command.\n"
-    )
 
 
-def print_interface_results(response: list, json: bool = False):
+def print_interface_results(
+    response: list, include_schema: bool = False, json: bool = False
+):
     """Utility function to print port data in a table structure
 
     Args:
         response_data (list): data returned from the request_data function
     """
-    include_schema = True
     try:
         response_data = response.json()
     except AttributeError:
@@ -294,7 +289,7 @@ def list_by_state_and_age(
             Defaults to node.
     """
     from_datetime = datetime.datetime.now() - datetime.timedelta(age)
-    base_url = f"http://localhost:3000/{target_item}s"
+    base_url = f"{BASE_URL}/{target_item}s"
     request_url = (
         f"{base_url}?select=*"
         f"&date_created=gte.{from_datetime}"
@@ -325,7 +320,7 @@ def list_by_type_and_age(
             Defaults to node.
     """
     from_datetime = datetime.datetime.now() - datetime.timedelta(age)
-    base_url = f"http://localhost:3000/{target_item}s"
+    base_url = f"{BASE_URL}/{target_item}s"
     request_url = (
         f"{base_url}?select=*"
         f"&date_created=gte.{from_datetime}"
@@ -354,7 +349,7 @@ def list_by_type_and_state(
         target_item (str): the target item to be listed e.g. node, port or interface.
             Defaults to node.
     """
-    base_url = f"http://localhost:3000/{target_item}s"
+    base_url = f"{BASE_URL}/{target_item}s"
     request_url = (
         f"{base_url}?select=*"
         f"&{target_item}_state=eq.{state}"
@@ -376,7 +371,7 @@ def list_by_item_state(state: str, target_item: str = "node", json: bool = False
         target_item (str): the target item to be listed e.g. node, port or interface.
             Defaults to node.
     """
-    base_url = f"http://localhost:3000/{target_item}s"
+    base_url = f"{BASE_URL}/{target_item}s"
     request_url = f"{base_url}?select=*&{target_item}_state=eq.{state}"
     response_data = request_data(request_url)
     if response_data:
@@ -396,7 +391,7 @@ def list_by_item_age(age: int, target_item: str = "node", json: bool = False):
             Defaults to node.
     """
     from_datetime = datetime.datetime.now() - datetime.timedelta(age)
-    base_url = f"http://localhost:3000/{target_item}s"
+    base_url = f"{BASE_URL}/{target_item}s"
     request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}"
     response = request_data(request_url)
     if response:
@@ -415,7 +410,7 @@ def search_by_id(target_item, argument):
     Returns:
         list: a list of items matching the search criteria.
     """
-    base_url = f"http://localhost:3000/{target_item}s"
+    base_url = f"{BASE_URL}/{target_item}s"
     request_url = f"{base_url}?id=eq.{argument}"
     response_data = request_data(request_url)
     return response_data
@@ -431,7 +426,7 @@ def search_by_name(target_item: str, argument: str):
     Returns:
         list: a list of items matching the search criteria.
     """
-    base_url = f"http://localhost:3000/{target_item}s"
+    base_url = f"{BASE_URL}/{target_item}s"
     request_url = f"{base_url}?name=phfts.{argument}"
     response_data = request_data(request_url)
     return response_data
@@ -448,7 +443,7 @@ def search_by_type(target_item: str, argument: str):
     Returns:
         list: a list of items matching the search criteria.
     """
-    base_url = f"http://localhost:3000/{target_item}s"
+    base_url = f"{BASE_URL}/{target_item}s"
     request_url = f"{base_url}?{target_item}_type=eq.{argument}"
     response_data = request_data(request_url)
     return response_data
@@ -465,7 +460,7 @@ def search_by_interface(target_item: str, argument: str):
     Returns:
         list: a list of items matching the search criteria.
     """
-    base_url = f"http://localhost:3000/{target_item}s"
+    base_url = f"{BASE_URL}/{target_item}s"
     request_url = f"{base_url}?node_id=eq.{argument}"
     response_data = request_data(request_url)
     return response_data
@@ -480,7 +475,7 @@ def fetch_lineage(id: str) -> list:
     Returns:
         [list]: a list of items matching the search criteria.
     """
-    request_url = f"http://localhost:3000/ancestor_nodes?root_node_id=eq.{id}"
+    request_url = f"{BASE_URL}/ancestor_nodes?root_node_id=eq.{id}"
     requested_data = request_data(request_url)
     return requested_data
 
