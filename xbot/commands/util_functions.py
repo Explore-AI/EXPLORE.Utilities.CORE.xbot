@@ -218,6 +218,7 @@ def print_interface_results(response: list, json: bool = False):
     Args:
         response_data (list): data returned from the request_data function
     """
+    include_schema = True
     try:
         response_data = response.json()
     except AttributeError:
@@ -231,13 +232,24 @@ def print_interface_results(response: list, json: bool = False):
         table.add_column("Sub scheme", justify="left", style="blue", no_wrap=True)
         table.add_column("Port number", justify="left", style="green", no_wrap=True)
         table.add_column("Node ID", justify="left", style="magenta", no_wrap=True)
+        if include_schema:
+            table.add_column(
+                "Schema definition function",
+                justify="left",
+                style="magenta",
+                no_wrap=False,
+            )
         for item in response_data:
-            table.add_row(
+            row = [
                 f'{item["id"]}',
                 f'{item["interface_sub_scheme"]}',
                 f'{item["port_number"]}',
                 f'{item["node_id"]}',
-            )
+            ]
+            if include_schema:
+                row.append(f'{item["schema_definition_function"]}')
+            table.add_row(*row)
+
         console.print(table)
         console.print(
             "\nHint: To view additional output in JSON format, append "
