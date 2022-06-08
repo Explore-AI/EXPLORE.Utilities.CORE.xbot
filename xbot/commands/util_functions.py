@@ -13,7 +13,6 @@ from dotenv import load_dotenv
 from requests.structures import CaseInsensitiveDict
 from rich import print
 from rich.console import Console
-from rich.style import Style
 from rich.table import Table
 from rich.tree import Tree
 
@@ -42,7 +41,9 @@ def generate_access_token(email: str, password: str) -> str:
             return token
         else:
             click.echo(
-                "The details entered are incorrect, please run [bold red]xbot config -e <your_email> -p <your_password>[/bold red] or contact your account owner for the required permissions."
+                "The details entered are incorrect, please run "
+                "[bold red]xbot config -e <your_email> -p <your_password>[/bold red] "
+                "or contact your account owner for the required permissions."
             )
             logger.info(f"Failed attempt to generate access token for {email}")
             exit()
@@ -119,7 +120,9 @@ def request_data(base_url: str) -> dict:
     except Exception as e:
         logger.error(e)
         console.print(
-            "It looks like you're not logged in. Please run [bold green]`xbot config`[/bold green] to make sure you have the required permissions."
+            "It looks like you're not logged in. Please run "
+            "[bold green]`xbot config`[/bold green] "
+            "to make sure you have the required permissions."
         )
 
 
@@ -127,7 +130,8 @@ def print_search(target_item: str, response: dict, json: bool = False) -> None:
     """Prints the data requested from the API.
 
     Args:
-        response_data (object): JSON object containing the data requested based on the base_url.
+        response_data (object): JSON object containing the data requested based on
+            the base_url.
         json (bool): whether to print the data in JSON format. Defaults to False.
     """
 
@@ -135,7 +139,8 @@ def print_search(target_item: str, response: dict, json: bool = False) -> None:
         response_data = response.json()
         if len(response_data) == 0:
             console.print(
-                "Your query returned no results. Please refine your search and try again."
+                "Your query returned no results. Please refine your search and try "
+                " again."
             )
         else:
             output_format = retrieve_output_format()
@@ -164,7 +169,6 @@ def print_port_results(response_data: list):
     table.add_column("State", justify="left", style="green", no_wrap=True)
     table.add_column("Description", justify="left", style="blue", no_wrap=False)
     table.add_column("Associated node", justify="left", style="cyan", no_wrap=True)
-    n = 0
     for item in response_data:
         table.add_row(
             f'{item["port_number"]}',
@@ -175,7 +179,8 @@ def print_port_results(response_data: list):
         )
     console.print(table)
     console.print(
-        f"\nHint: To view output in JSON format, append [bold cyan]--json[/bold cyan] or [bold cyan]-j[/bold cyan] to the previous command.\n"
+        "\nHint: To view output in JSON format, append [bold cyan]--json[/bold cyan] "
+        "or [bold cyan]-j[/bold cyan] to the previous command.\n"
     )
 
 
@@ -202,7 +207,8 @@ def print_node_results(response_data: list):
         )
     console.print(table)
     console.print(
-        f"\nHint: To view output in JSON format, append [bold cyan]--json[/bold cyan] or [bold cyan]-j[/bold cyan] to the previous command.\n"
+        "\nHint: To view output in JSON format, append [bold cyan]--json[/bold cyan] "
+        "or [bold cyan]-j[/bold cyan] to the previous command.\n"
     )
 
 
@@ -234,7 +240,9 @@ def print_interface_results(response: list, json: bool = False):
             )
         console.print(table)
         console.print(
-            f"\nHint: To view additional output in JSON format, append [bold cyan]--json[/bold cyan] or [bold cyan]-j[/bold cyan] to the previous command.\n"
+            "\nHint: To view additional output in JSON format, append "
+            "[bold cyan]--json[/bold cyan] or [bold cyan]-j[/bold cyan] to "
+            "the previous command.\n"
         )
 
 
@@ -268,18 +276,26 @@ def list_by_state_and_age(
 
     Args:
         age (int): number of days search criteria should apply to.
-        state (string): ["provisioned", "started", "active", "error", "stopped", "suspended"]
-        target_item (str): the target item to be listed e.g. node, port or interface. Defaults to node.
+        state (str): One of :
+            ["provisioned", "started", "active", "error", "stopped", "suspended"]
+        target_item (str): the target item to be listed e.g. node, port or interface.
+            Defaults to node.
     """
     from_datetime = datetime.datetime.now() - datetime.timedelta(age)
     base_url = f"http://localhost:3000/{target_item}s"
-    request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}&{target_item}_state=eq.{state}"
+    request_url = (
+        f"{base_url}?select=*"
+        f"&date_created=gte.{from_datetime}"
+        f"&{target_item}_state=eq.{state}"
+    )
     response = request_data(request_url)
     if response:
         return response
     else:
         console.print(
-            "We're having some trouble authenticating your profile. Please run [bold cyan]xbot config -e <your_email> -p <your_password> [/bold cyan] to login."
+            "We're having some trouble authenticating your profile. Please run "
+            "[bold cyan]xbot config -e <your_email> -p <your_password> [/bold cyan] "
+            "to login."
         )
 
 
@@ -293,11 +309,16 @@ def list_by_type_and_age(
 
     Args:
         age (int): number of days search criteria should apply to.
-        target_item (str): the target item to be listed e.g. node, port or interface. Defaults to node.
+        target_item (str): the target item to be listed e.g. node, port or interface.
+            Defaults to node.
     """
     from_datetime = datetime.datetime.now() - datetime.timedelta(age)
     base_url = f"http://localhost:3000/{target_item}s"
-    request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}&{target_item}_type=eq.{type}"
+    request_url = (
+        f"{base_url}?select=*"
+        f"&date_created=gte.{from_datetime}"
+        f"&{target_item}_type=eq.{type}"
+    )
     response = request_data(request_url)
     if response:
         return response
@@ -314,12 +335,19 @@ def list_by_type_and_state(
     """List items based on their state AND age.
 
     Args:
-        type (str): the type of node to be listed e.g. operational, digital-twin or aggregate.
-        state (string): ["provisioned", "started", "active", "error", "stopped", "suspended"]
-        target_item (str): the target item to be listed e.g. node, port or interface. Defaults to node.
+        type (str): the type of node to be listed e.g. operational, digital-twin or
+            aggregate.
+        state (str): One of:
+            ["provisioned", "started", "active", "error", "stopped", "suspended"]
+        target_item (str): the target item to be listed e.g. node, port or interface.
+            Defaults to node.
     """
     base_url = f"http://localhost:3000/{target_item}s"
-    request_url = f"{base_url}?select=*&{target_item}_state=eq.{state}&{target_item}_type=eq.{type}"
+    request_url = (
+        f"{base_url}?select=*"
+        f"&{target_item}_state=eq.{state}"
+        f"&{target_item}_type=eq.{type}"
+    )
     response = request_data(request_url)
     if response:
         return response
@@ -331,8 +359,10 @@ def list_by_item_state(state: str, target_item: str = "node", json: bool = False
     """List items based on their state.
 
     Args:
-        state (string): ["provisioned", "started", "active", "error", "stopped", "suspended"]
-        target_item (str): the target item to be listed e.g. node, port or interface. Defaults to node.
+        state (str): One of:
+            ["provisioned", "started", "active", "error", "stopped", "suspended"]
+        target_item (str): the target item to be listed e.g. node, port or interface.
+            Defaults to node.
     """
     base_url = f"http://localhost:3000/{target_item}s"
     request_url = f"{base_url}?select=*&{target_item}_state=eq.{state}"
@@ -348,8 +378,10 @@ def list_by_item_age(age: int, target_item: str = "node", json: bool = False):
 
     Args:
         age (int): number of days search criteria should apply to.
-        state (string): ["provisioned", "started", "active", "error", "stopped", "suspended"]
-        target_item (str): the target item to be listed e.g. node, port or interface. Defaults to node.
+        state (str): One of:
+            ["provisioned", "started", "active", "error", "stopped", "suspended"]
+        target_item (str): the target item to be listed e.g. node, port or interface.
+            Defaults to node.
     """
     from_datetime = datetime.datetime.now() - datetime.timedelta(age)
     base_url = f"http://localhost:3000/{target_item}s"
@@ -398,7 +430,8 @@ def search_by_type(target_item: str, argument: str):
 
     Args:
         target_item (str): the target item to be listed e.g. node, port or interface.
-        argument (str): the type of the item to be searched for. Options = ["operational", "enrichment"]
+        argument (str): the type of the item to be searched for.
+            One of: ["operational", "enrichment"]
 
     Returns:
         list: a list of items matching the search criteria.
@@ -413,7 +446,8 @@ def search_by_interface(target_item: str, argument: str):
     """Search for interfaces on a node.
 
     Args:
-        target_item (str): the target item to be listed e.g. node, port or interface. Interface in this instance
+        target_item (str): the target item to be listed e.g. node, port or interface.
+            Interface in this instance
         argument (str): the node_id of the node you want to see the interfaces for
 
     Returns:
@@ -459,14 +493,17 @@ def print_lineage(
         response_data = response.json()
         output_format = retrieve_output_format()
         node = search_by_id(target_item="node", argument=id)
-        # Note: it is necessary to convert the node data to json before extracting the name.
+        # It is necessary to convert the node data to json before extracting the name.
         node_name = node.json()[0]["name"]
         if output_format == "json" or json:
             console.print_json(data=response_data)
         elif tree:
             tree_items = [node_name]
             tree = Tree(
-                f"\n[bold cyan]{target_lineage.upper()} TREE: {node_name.upper()}[/bold cyan]"
+                (
+                    f"\n[bold cyan]{target_lineage.upper()} "
+                    f"TREE: {node_name.upper()}[/bold cyan]"
+                )
             )
             for item in response_data:
                 item_name = item[f"{target_lineage}_node_name"]
@@ -494,7 +531,10 @@ def print_lineage(
             console.print(table)
     else:
         console.print(
-            "It looks like your access token has expired. Please run [bold cyan]xbot config -e <your_email> -p <your_password> [/bold cyan] to generate a new one."
+            "It looks like your access token has expired. "
+            "Please run: "
+            "[bold cyan]xbot config -e <your_email> -p <your_password> [/bold cyan] "
+            "to generate a new one."
         )
 
 
@@ -504,7 +544,10 @@ def print_error_message() -> None:
         """
             Something went wrong. Try these troubleshooting methods:
 
-            1. Run [bold green]xbot config -e <your_email> -p <your_password> [/bold green] to ensure your permissions are configuired.
-            2. Contact a member of the CORE team at [bold]core-platform@explore-utilities.com[/bold]
+            1. Run:
+                [bold green]xbot config -e <your_email> -p <your_password> [/bold green]
+                to ensure your permissions are configuired.
+            2. Contact a member of the CORE team at:
+                [bold]core-platform@explore-utilities.com[/bold]
             """
     )
