@@ -59,9 +59,13 @@ def read_config() -> Dict[str, str]:
     """
     Read config file
     """
-    with open(CONFIG_FILE, "r") as f:
-        d = json.load(f)
-    return d
+    try:
+        with open(CONFIG_FILE, "r") as f:
+            d = json.load(f)
+        return d
+    except FileNotFoundError:
+        logger.fatal("No config found, please run `xbot config` to create one.")
+    exit()
 
 
 def retrieve_access_token() -> str:
@@ -111,12 +115,12 @@ def write_config(host: str, email: str, password: str, json_format: bool) -> Non
     try:
         os.chmod(CONFIG_FILE, S_IWUSR | S_IREAD)
         with open(CONFIG_FILE, "w") as outfile:
-            json.dump(data, outfile)
+            json.dump(data, outfile, indent=4, sort_keys=True)
     except FileNotFoundError:
         open(CONFIG_FILE, "w")
         os.chmod(CONFIG_FILE, S_IWUSR | S_IREAD)
         with open(CONFIG_FILE, "w") as outfile:
-            json.dump(data, outfile)
+            json.dump(data, outfile, indent=4, sort_keys=True)
 
 
 def request_data(url: str) -> dict:
