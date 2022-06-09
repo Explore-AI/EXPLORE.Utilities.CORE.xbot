@@ -4,6 +4,7 @@ import logging
 import os
 
 from stat import S_IREAD, S_IWUSR
+from typing import Dict
 
 import click
 import pytz
@@ -23,20 +24,20 @@ console = Console()
 FORMATTER = "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
 VALID_LOG_LEVELS = ["debug", "info", "warning", "error", "critical"]
 
-BASE_URL = "http://localhost:3000"
+CONFIG_FILE = "config.json"
 
 
 logger = logging.getLogger()
 
 
-def generate_access_token(email: str, password: str) -> str:
+def generate_access_token(host: str, email: str, password: str) -> str:
     """Generates an access token required to make requests to the API.
 
     Returns:
         str: JWT access token that is used in the headers of all requests.
     """
     try:
-        url = f"{BASE_URL}/rpc/login"
+        url = f"{host}/rpc/login"
         response = requests.post(url, json={"email": email, "password": password})
         if response.status_code == 200:
             token = response.json()["token"]
@@ -54,16 +55,24 @@ def generate_access_token(email: str, password: str) -> str:
         exit()
 
 
-def retrieve_access_token() -> str:
-    """Retrieve access token used to access API.
-
-    Returns:
-        str: access token used to access API.
+def read_config() -> Dict[str, str]:
     """
-    with open("config.json", "r") as openfile:
-        json_object = json.load(openfile)
-        access_token = json_object["access_token"]
-    return access_token
+    Read config file
+    """
+    with open(CONFIG_FILE, "r") as f:
+        d = json.load(f)
+    return d
+
+
+def retrieve_access_token() -> str:
+    """
+    Retrieve access token used to access api.
+
+    returns:
+        str: access token used to access api.
+    """
+    cfg = read_config()
+    return cfg["access_token"]
 
 
 def retrieve_output_format() -> str:
@@ -72,52 +81,59 @@ def retrieve_output_format() -> str:
     Returns:
         str: the output format.
     """
-    with open("config.json", "r") as openfile:
-        json_object = json.load(openfile)
-        output_format = json_object["output_format"]
-    return output_format
+    cfg = read_config()
+    return cfg["output_format"]
 
 
-def store_access_token(email: str, password: str, json_format: bool) -> None:
+def retrieve_host() -> str:
+    """
+    Retrieve host of api.
+
+    returns:
+        str: hostname of API
+    """
+    cfg = read_config()
+    return cfg["host"]
+
+
+def write_config(host: str, email: str, password: str, json_format: bool) -> None:
     """Store access token used to access API.
 
     Args:
         email (str): email used to generate access token.
         password (str[): password used to generate access token.
     """
-    access_token = generate_access_token(email, password)
-    if json_format:
-        data = {"access_token": access_token, "output_format": "json"}
-    else:
-        data = {"access_token": access_token, "output_format": "default"}
-    filename = "config.json"
+    access_token = generate_access_token(host, email, password)
+    output_format = "json" if json_format else "default"
+
+    data = {"host": host, "access_token": access_token, "output_format": output_format}
+
     try:
-        os.chmod(filename, S_IWUSR | S_IREAD)
-        with open(filename, "w") as outfile:
+        os.chmod(CONFIG_FILE, S_IWUSR | S_IREAD)
+        with open(CONFIG_FILE, "w") as outfile:
             json.dump(data, outfile)
     except FileNotFoundError:
-        open(filename, "w")
-        os.chmod(filename, S_IWUSR | S_IREAD)
-        with open(filename, "w") as outfile:
+        open(CONFIG_FILE, "w")
+        os.chmod(CONFIG_FILE, S_IWUSR | S_IREAD)
+        with open(CONFIG_FILE, "w") as outfile:
             json.dump(data, outfile)
 
 
-def request_data(base_url: str) -> dict:
+def request_data(url: str) -> dict:
     """Requests data from the API.
 
     Args:
-        base_url (str): the URL and query paramaters to be used in the request.
+        url (str): the URL and query paramaters to be used in the request.
 
     Returns:
-        list: JSON object containing the data requested based on the base_url.
+        list: JSON object containing the data requested based on the url.
     """
     try:
         access_token = retrieve_access_token()
-        request_url = f"{base_url}"
         headers = CaseInsensitiveDict()
         headers["Accept"] = "application/json"
         headers["Authorization"] = f"Bearer {access_token}"
-        response = requests.get(request_url, headers=headers)
+        response = requests.get(url, headers=headers)
         return response
     except Exception as e:
         logger.error(e)
@@ -133,7 +149,7 @@ def print_search(target_item: str, response: dict, json: bool = False) -> None:
 
     Args:
         response_data (object): JSON object containing the data requested based on
-            the base_url.
+            the url.
         json (bool): whether to print the data in JSON format. Defaults to False.
     """
 
@@ -257,7 +273,7 @@ def get_item_age(item: str) -> str:
     """Calculates the age of an item.
 
     Args:
-        item (object): JSON object containing the data requested based on the base_url.
+        item (object): JSON object containing the data requested based on the url.
 
     Returns:
         str: the age of the item.
@@ -289,13 +305,14 @@ def list_by_state_and_age(
             Defaults to node.
     """
     from_datetime = datetime.datetime.now() - datetime.timedelta(age)
-    base_url = f"{BASE_URL}/{target_item}s"
-    request_url = (
-        f"{base_url}?select=*"
+    host = retrieve_host()
+    url = f"{host}/{target_item}s"
+    url = (
+        f"{url}?select=*"
         f"&date_created=gte.{from_datetime}"
         f"&{target_item}_state=eq.{state}"
     )
-    response = request_data(request_url)
+    response = request_data(url)
     if response:
         return response
     else:
@@ -320,13 +337,14 @@ def list_by_type_and_age(
             Defaults to node.
     """
     from_datetime = datetime.datetime.now() - datetime.timedelta(age)
-    base_url = f"{BASE_URL}/{target_item}s"
-    request_url = (
-        f"{base_url}?select=*"
+    host = retrieve_host()
+    url = f"{host}/{target_item}s"
+    url = (
+        f"{url}?select=*"
         f"&date_created=gte.{from_datetime}"
         f"&{target_item}_type=eq.{type}"
     )
-    response = request_data(request_url)
+    response = request_data(url)
     if response:
         return response
     else:
@@ -349,13 +367,14 @@ def list_by_type_and_state(
         target_item (str): the target item to be listed e.g. node, port or interface.
             Defaults to node.
     """
-    base_url = f"{BASE_URL}/{target_item}s"
-    request_url = (
-        f"{base_url}?select=*"
+    host = retrieve_host()
+    url = f"{host}/{target_item}s"
+    url = (
+        f"{url}?select=*"
         f"&{target_item}_state=eq.{state}"
         f"&{target_item}_type=eq.{type}"
     )
-    response = request_data(request_url)
+    response = request_data(url)
     if response:
         return response
     else:
@@ -371,9 +390,10 @@ def list_by_item_state(state: str, target_item: str = "node", json: bool = False
         target_item (str): the target item to be listed e.g. node, port or interface.
             Defaults to node.
     """
-    base_url = f"{BASE_URL}/{target_item}s"
-    request_url = f"{base_url}?select=*&{target_item}_state=eq.{state}"
-    response_data = request_data(request_url)
+    host = retrieve_host()
+    url = f"{host}/{target_item}s"
+    url = f"{url}?select=*&{target_item}_state=eq.{state}"
+    response_data = request_data(url)
     if response_data:
         return response_data
     else:
@@ -391,9 +411,10 @@ def list_by_item_age(age: int, target_item: str = "node", json: bool = False):
             Defaults to node.
     """
     from_datetime = datetime.datetime.now() - datetime.timedelta(age)
-    base_url = f"{BASE_URL}/{target_item}s"
-    request_url = f"{base_url}?select=*&date_created=gte.{from_datetime}"
-    response = request_data(request_url)
+    host = retrieve_host()
+    url = f"{host}/{target_item}s"
+    url = f"{url}?select=*&date_created=gte.{from_datetime}"
+    response = request_data(url)
     if response:
         return response
     else:
@@ -410,9 +431,10 @@ def search_by_id(target_item, argument):
     Returns:
         list: a list of items matching the search criteria.
     """
-    base_url = f"{BASE_URL}/{target_item}s"
-    request_url = f"{base_url}?id=eq.{argument}"
-    response_data = request_data(request_url)
+    host = retrieve_host()
+    url = f"{host}/{target_item}s"
+    url = f"{url}?id=eq.{argument}"
+    response_data = request_data(url)
     return response_data
 
 
@@ -426,9 +448,10 @@ def search_by_name(target_item: str, argument: str):
     Returns:
         list: a list of items matching the search criteria.
     """
-    base_url = f"{BASE_URL}/{target_item}s"
-    request_url = f"{base_url}?name=phfts.{argument}"
-    response_data = request_data(request_url)
+    host = retrieve_host()
+    url = f"{host}/{target_item}s"
+    url = f"{url}?name=phfts.{argument}"
+    response_data = request_data(url)
     return response_data
 
 
@@ -443,9 +466,10 @@ def search_by_type(target_item: str, argument: str):
     Returns:
         list: a list of items matching the search criteria.
     """
-    base_url = f"{BASE_URL}/{target_item}s"
-    request_url = f"{base_url}?{target_item}_type=eq.{argument}"
-    response_data = request_data(request_url)
+    host = retrieve_host()
+    url = f"{host}/{target_item}s"
+    url = f"{url}?{target_item}_type=eq.{argument}"
+    response_data = request_data(url)
     return response_data
 
 
@@ -460,9 +484,10 @@ def search_by_interface(target_item: str, argument: str):
     Returns:
         list: a list of items matching the search criteria.
     """
-    base_url = f"{BASE_URL}/{target_item}s"
-    request_url = f"{base_url}?node_id=eq.{argument}"
-    response_data = request_data(request_url)
+    host = retrieve_host()
+    url = f"{host}/{target_item}s"
+    url = f"{url}?node_id=eq.{argument}"
+    response_data = request_data(url)
     return response_data
 
 
@@ -475,8 +500,9 @@ def fetch_lineage(id: str) -> list:
     Returns:
         [list]: a list of items matching the search criteria.
     """
-    request_url = f"{BASE_URL}/ancestor_nodes?root_node_id=eq.{id}"
-    requested_data = request_data(request_url)
+    host = retrieve_host()
+    url = f"{host}/ancestor_nodes?root_node_id=eq.{id}"
+    requested_data = request_data(url)
     return requested_data
 
 

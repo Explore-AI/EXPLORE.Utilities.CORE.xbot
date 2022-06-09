@@ -17,44 +17,43 @@ from xbot.commands.util_functions import (
     print_search,
     request_data,
     retrieve_access_token,
+    retrieve_host,
     search_by_id,
     search_by_interface,
     search_by_name,
     search_by_type,
-    store_access_token,
+    write_config,
 )
 
 CLOUD_PROVIDERS = ["aws", "azure", "gcp"]
 ITEM_TYPES = ["operational", "digital-twin", "aggregate"]
 ITEM_STATES = ["provisioned", "started", "active", "error", "stopped", "suspended"]
-BASE_URL = "http://localhost:3000"
 
 logger = logging.getLogger(__name__)
 console = Console(record=True)
 
 
 @click.command()
-@click.option("--email", "-e", help="Username")
+@click.option("--host", "-e", help="URL to mesh API host")
+@click.option("--email", "-e", help="User email address")
 @click.option("--password", "-p", help="Password")
 @click.option("--json", is_flag=True, help="Default to output in JSON format")
-def config(email: str, password: str, json: bool) -> None:
+def config(host: str, email: str, password: str, json: bool) -> None:
     """Stores access token and global settings of the user.
 
     Args:
-        url (str): Mesh API url TODO
+        host (str): Mesh API host
         email (str): user email
         password (str): user password
     """
-    if email and password:
-        store_access_token(email, password, json)
-        access_token = retrieve_access_token()
-        logger.info(f"Storage of access token: {access_token}")
-    else:
+    if host is None or email is None or password is None:
+        host = click.prompt("Host", type=str)
         email = click.prompt("Email", type=str)
         password = click.prompt("Password", type=str)
-        store_access_token(email, password, json)
-        access_token = retrieve_access_token()
-        logger.info(f"Storage of access token: {access_token}")
+
+    write_config(host, email, password, json)
+    access_token = retrieve_access_token()
+    logger.info(f"Storage of access token: {access_token}")
 
 
 @click.command()
@@ -100,7 +99,8 @@ def ls(
         parameter = sys.argv[4]
     else:
         parameter = None
-    url = f"{BASE_URL}/{target_item}s"
+    host = retrieve_host()
+    url = f"{host}/{target_item}s"
     response = request_data(url)
     if target_item == "node" or target_item == "port":
         if response is not None:
@@ -155,7 +155,8 @@ def ls_interfaces(
     Args:
         json (bool): whether to print the data in JSON format. Defaults to False.
     """
-    url = f"{BASE_URL}/interfaces"
+    host = retrieve_host()
+    url = f"{host}/interfaces"
     response = request_data(url)
     if response is not None:
         print_interface_results(response, include_schema, json)
@@ -191,7 +192,8 @@ def total() -> None:
         will list the total number of items in the mesh.
     """
     target_item = sys.argv[1]
-    url = f"{BASE_URL}/{target_item}s"
+    host = retrieve_host()
+    url = f"{host}/{target_item}s"
     response = request_data(url)
     response = response.json()
     console.print(
